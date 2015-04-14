@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-ieig",argv[i]) == 0) {strcpy(eigen_name,argv[i+1]);}
  		if (strcmp("-ligc",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);ligalign = temp;}
  		if (strcmp("-angle",argv[i]) == 0) {torsion = 1;}
- 		if (strcmp("-iterative",argv[i]) == 0) {iterative_flag = 1;}
+ 		if (strcmp("-	",argv[i]) == 0) {iterative_flag = 1;}
  	}
  	
  	if (help_flag == 1) {

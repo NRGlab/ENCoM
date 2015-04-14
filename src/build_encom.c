@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	int no_write = 0;
 	int covariance_flag = 0;
 	int total_model = 0;
-	int noligand = 0;
+	float noligand = -1;
  	for (i = 1;i < argc;i++) {
  		if (strcmp("-il",argv[i]) == 0) {
  			while (strncmp(argv[i+1+total_model],".pdb",4)>0) {
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-no",argv[i]) == 0) {no_write = 1;}
  		if (strcmp("-cov",argv[i]) == 0)  {covariance_flag = 1;strcpy(covariance_name,argv[i+1]);}
  		if (strcmp("-fcov",argv[i]) == 0) {covariance_flag = 2;strcpy(covariance_name,argv[i+1]);}
- 		if (strcmp("-nolig",argv[i]) == 0) {noligand =1 ;}
+ 		if (strcmp("-nolig",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);noligand = temp;}
  		
  	}
  	int count = 0;
@@ -207,12 +207,18 @@ int main(int argc, char *argv[]) {
 	
 	// Si on veut juste les valeurs de la prot sans le ligand
 	
-	if (noligand == 1) {
+	if (noligand > 0) {
 		// Combien de ligand node
 		int atom_no_lig = 0;
 		for(i=0;i<atom;++i) {
 			if (strc_node[i].atom_type != 3) {
 				++atom_no_lig;
+				
+				// On veut enlever un cutoff autour du ligand
+				
+				
+				
+				
 			}
 		}
 		printf("Atom no lig:%d\n",atom_no_lig);

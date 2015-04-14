@@ -1335,7 +1335,8 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 		amp[i]  = 0;
 		namp[i] = 0;
 	}
-	
+	FILE *file;
+ 	file = fopen("fit_svd.pdb","w");
 
 	for(j = 0;j<nb_mode;++j) {
 		//printf("J:%d\n",j);
@@ -1350,12 +1351,21 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 	 		
 	 		for(l=0;l<nb_mode;++l) {
 	 			apply_eigen(store_init,atom,eval,mode+l,namp[l]);
+	 			
 	 		}
 		 	
 	 		newstrc = rmsd_no(store_init,targ,atom,align);
 	 		if (i == 0) {old = newstrc+1;}
-	 		if (step < 0.0001 && step > -0.0001) {amp[j] = namp[j];printf("%3d Mode:%4d Amp:%7.4f	Step:%7.4f	RMSD:%10.9f\n",i,mode+j+1,namp[j],step,sqrt(newstrc));break;}
-	 		//
+	 		if (step < 0.0001 && step > -0.0001) {
+	 			amp[j] = namp[j];
+	 			apply_eigen(all_init,all,eval,mode+j,namp[j]);
+	 			printf("%3d Mode:%4d Amp:%7.4f	Step:%7.4f	RMSD:%10.9f\n",i,mode+j+1,namp[j],step,sqrt(newstrc));
+	 			
+	 			write_movie(file,all_init,all,j);
+	 			
+	 			break;
+	 		}
+	 		
 	 		if (i > nb_mode * atom *100) {break;}
 			if (old < newstrc) {step = -step/10;}
 			//if (old == newstrc && i > 4) {amp[j] = namp[j];break;}
@@ -1363,6 +1373,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 	 		namp[j] += step;
 		}
 	}
+	fclose(file);
 	// Monte Carlo Approch
 	/*for(i=0;i<nb_mode;++i) {
 		amp[i] = namp[i];
