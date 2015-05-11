@@ -215,7 +215,7 @@ int calc_region(struct atom PDB[], int PDBtot, int atomlist[], int numatoms,
 	float rado; // radius of atomzero PLUS radius of water
 	float SAS; // solvent exposed surface in square angstroms
 	char surfatom; // atom type, 'I' internal, 'S' surface
-	float SAStot;
+	float SAStot = 0.0;
 	long int currindex;
 	int contnum;
 	float *coorA, *coorB; // coordinate pointers
@@ -223,21 +223,26 @@ int calc_region(struct atom PDB[], int PDBtot, int atomlist[], int numatoms,
 	for (atomi = 0; atomi < numatoms; ++atomi) {
 
 		// ============= atom contact calculations =============
-		//printf("I:%4d / %4d\n",atomi,numatoms);
+		printf("I:%4d / %4d\n",atomi,numatoms);
 		atomzero = atomlist[atomi];
 		rado = PDB[atomzero].radius + Rw;
 
 		NC = get_contlist4(PDB, atomzero, contlist, PDBtot, rado, big_g->dim,
 				big_g);
+		printf("\ttag1\n");
 
 		NV = voronoi_poly2(PDB, atomzero, big_g->cont, rado, NC, contlist,
 				big_g);
+		printf("\ttag2\n");
 
 		surfatom = order_faces(atomzero, big_g->poly, big_g->centerpt, rado, NC,
 				NV, big_g->cont, big_g->ptorder);
+		printf("\t %f %d %d\n",rado, NC, NV);
 		calc_areas(big_g->poly, big_g->centerpt, rado, NC, NV, big_g->cont,
 				big_g->ptorder, atomzero);
+		printf("\ttag3\n");
 		save_areas(big_g->cont, contlist, NC, atomzero, big_g);
+		printf("\ttag4\n");
 
 		// ============  SAS contact area calculations ============
 		areao = 4.0 * PI * rado * rado;
@@ -1058,6 +1063,7 @@ void calc_areas(struct vertex poly[], struct vertex centerpt[], float rado,
 
 	//RESET AREAS TO ZERO
 	for (planeX = 0; planeX < NC; ++planeX) {
+				printf("\tplane: %d %d \n",planeX, NC);
 		cont[planeX].area = 0.0;
 		if (cont[planeX].flag == 'E') {
 			engflag = 'Y';
@@ -1067,14 +1073,18 @@ void calc_areas(struct vertex poly[], struct vertex centerpt[], float rado,
 	}
 
 	if (engflag == 'Y') { // engulfing plane correction - project points onto sphere surface.
+		printf("\tenflag\n");
 		project_points(poly, centerpt, rado, NC, NV, cont);
+		printf("\tenflag2\n");
 	}
 
 	/* ---------------------------- */
 	/* calculate area for each face */
 	/* ---------------------------- */
+		printf("\tpp\n");
 
 	for (planeX = 0; planeX < NC; ++planeX) {
+				printf("\tplane2: %d %d \n",planeX, NC);
 		NP = ptorder[planeX].numpts;
 		area = 0.0;
 		if (cont[planeX].flag == 'X') {
@@ -1105,6 +1115,7 @@ void calc_areas(struct vertex poly[], struct vertex centerpt[], float rado,
 
 			// ------ calculate cosines and angles ------
 			for (vi = 0; vi < NP; ++vi) {
+				printf("\tVI1: %d \n",vi);
 				v0 = ptorder[planeX].pt[0];
 				va = ptorder[planeX].pt[vi];
 				vb = ptorder[planeX].pt[(vi + 1) % NP];
@@ -1126,6 +1137,7 @@ void calc_areas(struct vertex poly[], struct vertex centerpt[], float rado,
 
 			// ----- calculate area of triangles in face -----
 			for (vi = 1; vi < (NP - 1); ++vi) {
+				printf("\tVI2: %d \n",vi);
 				U = sqrt(
 						(1 + cosNzero[vi]) * (1 + cosNN1[vi])
 								* (1 + cosNzero[vi + 1]) / 8.0);
@@ -1364,7 +1376,9 @@ void project_points(struct vertex poly[], struct vertex centerpt[], float rado,
 	}
 
 	for (vi = 0; vi < NV; ++vi) {
+		printf("\t\ttestP: %d %d\n",vi,NV);
 		if (poly[vi].plane[2] != -1) {
+		printf("\t\tinIF\n");
 			// project point to intersection of engulfing plane(s) and surface of sphere
 			P = poly[vi].xi;
 			V[0] = P[0] - projpt[0];
@@ -1380,6 +1394,8 @@ void project_points(struct vertex poly[], struct vertex centerpt[], float rado,
 			poly[vi].dist = rado;
 		}
 	}
+			printf("\t\tbefore_return\n");
+
 	return;
 }
 
