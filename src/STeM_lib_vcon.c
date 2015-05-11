@@ -124,10 +124,14 @@ int vcon_file_dom(struct pdb_atom *strc, gsl_matrix *m, int allatom) {
 
 	// initialize contact atom index
 	big_g.ca_index = (long int*) malloc(allatom * sizeof(long int));
+	printf("tag1\n");
 	big_g.ca_recsize = 5 * allatom;
+	printf("tag2\n");
 	big_g.ca_rec = (struct ca_struct*) malloc(
 			big_g.ca_recsize * sizeof(struct ca_struct));
+	printf("tag3\n");
 	big_g.seed = (long int*) malloc(3 * allatom * sizeof(long int));
+	printf("tag4\n");
 	if ((!big_g.ca_rec) || (!big_g.ca_index) || (!big_g.seed)) {
 		printf("memory allocation error\n");
 		exit(1);
@@ -137,13 +141,16 @@ int vcon_file_dom(struct pdb_atom *strc, gsl_matrix *m, int allatom) {
 		big_g.ca_index[atomi] = -1; //initialize pointer array
 		big_g.seed[atomi * 3] = -1; // initialize seed array
 	}
+	printf("tag5\n");
 
 	// assign protein atoms to boxes in cubic grid
 	big_g.dim = index_protein_vcon(allatom, &big_g);
+	printf("tag6\n");
 
 	// calc volumes for all protein atoms
 	calc_region(PDB, allatom, PDBlist, allatom,  &big_g, allatom, strc,
 			m);
+	printf("tag7\n");
 
 	return (0);
 }
