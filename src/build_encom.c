@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
  			}
  			--help_flag;
  		}
- 			if (strcmp("-i",argv[i]) == 0) {strcpy(file_name[total_model],argv[i+1]);++total_model;}
+ 		if (strcmp("-i",argv[i]) == 0) {strcpy(file_name[total_model],argv[i+1]);++total_model;}
  		if (strcmp("-inp",argv[i]) == 0) {strcpy(inputname,argv[i+1]);--help_flag;}
  		if (strcmp("-h",argv[i]) == 0) {++help_flag;}
  		if (strcmp("-v",argv[i]) == 0) {verbose = 1;}
