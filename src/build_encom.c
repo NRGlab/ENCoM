@@ -369,13 +369,15 @@ void write_template(char filename[500],gsl_matrix *m,int nb_atom, struct pdb_ato
 
 void add_model(char filename[500],gsl_matrix *m,char matrix_name[500],float init_templaate,float vinit,float bond_factor,float angle_factor,float kp_factor,int lig,char inputname[500]) {
 	int i,j;
+	
 	double K_phi1 = 1;				// Facteurs pour angles dièdres
 	double K_phi3 = 0.5;
 	int verbose = 0;
+	
 	int all = count_atom(filename);
-
+	
  	int nconn = count_connect(filename);
- 	
+ 	//printf("In function:%s\n",filename);
  	if (verbose == 1) {printf("Connect:%d\n",nconn);}
  	
 	if (verbose == 1) {printf("Assigning Structure\n\tAll Atom\n");}

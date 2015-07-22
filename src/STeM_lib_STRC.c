@@ -94,16 +94,16 @@ int check_covalent_CA(struct pdb_atom *CA,struct pdb_atom *strc,int atom,int all
  		//printf("Node:%d	Atom:-%s- Res:-%s-\n",strc[i].node,strc[i].atom_prot_type,strc[i].res_type);
  		if (strc[i].node != a) {continue;}
  		//printf("	Node:%d	Atom:-%s- Res:-%s-\n",strc[i].node,strc[i].atom_prot_type,strc[i].res_type);
- 		if ((strcmp(strc[i].atom_prot_type," P   ") == 0) || (strncmp(strc[i].atom_prot_type," O3'",4) == 0)) {} else {continue;}
+ 		//if ((strcmp(strc[i].atom_prot_type," P   ") == 0) || (strncmp(strc[i].atom_prot_type," O3'",4) == 0)) {} else {continue;}
  		//printf("		Node:%d	Atom:-%s- Res:-%s-\n",strc[i].node,strc[i].atom_prot_type,strc[i].res_type);
  		for(j=0;j<all;++j) {
  			if (strc[j].node != b) {continue;}
  			if(strncmp(strc[j].atom_prot_type,strc[i].atom_prot_type,4) == 0) {continue;}
- 			if ((strcmp(strc[j].atom_prot_type," P   ") == 0) || (strncmp(strc[j].atom_prot_type," O3'",4) == 0)) {} else {continue;}
+ 			//if ((strcmp(strc[j].atom_prot_type," P   ") == 0) || (strncmp(strc[j].atom_prot_type," O3'",4) == 0)) {} else {continue;}
  			dist = (strc[i].x_cord - strc[j].x_cord)*(strc[i].x_cord - strc[j].x_cord)+(strc[i].y_cord - strc[j].y_cord)*(strc[i].y_cord - strc[j].y_cord)+(strc[i].z_cord - strc[j].z_cord)*(strc[i].z_cord - strc[j].z_cord);
  			
- 			if(4 > dist) {
- 				//printf("Node:%d %dAtom:-%s-	-%s-	Dist:%f	Res:%d	%d\n",a,b,strc[i].atom_prot_type,strc[j].atom_prot_type,dist,strc[i].res_number,strc[j].res_number);
+ 			if(6 > dist) {
+ 				printf("Node:%d %dAtom:-%s-	-%s-	Dist:%f	Res:%d	%d\n",a,b,strc[i].atom_prot_type,strc[j].atom_prot_type,dist,strc[i].res_number,strc[j].res_number);
  				
  				return(1);
  			}
@@ -355,6 +355,8 @@ int count_atom(char filename[100]) {
  		if  (
  				(strncmp(all[i].atom_prot_type," CA ",4) == 0 && (all[i].atom_type == 2 || all[i].atom_type == 1)) || 
  				(strncmp(all[i].atom_prot_type," O3'",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
+ 				(strncmp(all[i].atom_prot_type," C2 ",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
+ 				(strncmp(all[i].atom_prot_type," P  ",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
  				lig_flag == 3
  			) {} else {
  			//if (all[i].node < 40) {	printf("I:%d Node:%d	Atom:%d	Type:%s	Res num:%d	Res Type:%s Type:%d Flag:%d\n",i,all[i].node,all[i].atom_number,all[i].atom_prot_type,all[i].res_number,all[i].res_type,all[i].atom_type,lig_flag);}
@@ -362,6 +364,9 @@ int count_atom(char filename[100]) {
  				
  				}
  		if (ligand == 0 && all[i].atom_type == 3) {continue;}
+ 		
+ 		if (CA[k].node ==  all[i].node) {continue;}
+ 		
  		++k;
  		
  		//printf("K:%d Node:%d	Atom:%d	Type:%s	Res num:%d	Res Type:%s Con:%d %d %d Type:%d Lig:%d\n",k,all[i].node,all[i].atom_number,all[i].atom_prot_type,all[i].res_number,all[i].res_type,all[i].node_c[0],all[i].node_c[1],all[i].node_c[2],all[i].atom_type,ligand);
@@ -454,13 +459,13 @@ int count_atom(char filename[100]) {
  	for (i=0;i<atom;++i) {
  		CA[all[i].node].mass += all[i].mass;
  	}
- 	/*for (i=0;i<k+1;++i) {
+ 	for (i=0;i<k+1;++i) {
  		printf("CA I:%d Type:%d Node:%d Atom:%d Type:%s Res num:%d Res Type:%s Con:%d %d %d %d %d %d Cord:%f,%f,%f Mass:%f\n",i,CA[i].atom_type,CA[i].node,CA[i].atom_number,CA[i].atom_prot_type,CA[i].res_number,CA[i].res_type,CA[i].node_c[0],CA[i].node_c[1],CA[i].node_c[2],CA[i].node_c[3],CA[i].node_c[4],CA[i].node_c[5],CA[i].x_cord,CA[i].y_cord,CA[i].z_cord,CA[i].mass);
  		if (i != CA[i].node) {
  			printf(" Node don't fit ID, I last\n");
  			break;
  		}
- 	}*/
+ 	}
  	return(k+1);
  
  }
