@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 	int covariance_flag = 0;
 	int total_model = 0;
 	float noligand = -1;
+	int only_bfact = 0;
  	for (i = 1;i < argc;i++) {
  		if (strcmp("-il",argv[i]) == 0) {
  			while (strncmp(argv[i+1+total_model],".pdb",4)>0) {
@@ -68,6 +69,7 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-hes",argv[i]) == 0) {strcpy(hessian_name,argv[i+1]);++hessian_flag;}
  		if (strcmp("-ihes",argv[i]) == 0) {strcpy(ihess_name,argv[i+1]);++invert_hessian;}
  		if (strcmp("-pt",argv[i]) == 0) {print_template = 1;}
+ 		if (strcmp("-b",argv[i]) == 0) {only_bfact = 1;}
  		if (strcmp("-no",argv[i]) == 0) {no_write = 1;}
  		if (strcmp("-cov",argv[i]) == 0)  {covariance_flag = 1;strcpy(covariance_name,argv[i+1]);}
  		if (strcmp("-fcov",argv[i]) == 0) {covariance_flag = 2;strcpy(covariance_name,argv[i+1]);}
@@ -335,7 +337,14 @@ int main(int argc, char *argv[]) {
 		gsl_matrix_free(k_inverse);
 		fclose(file);
 	}
-
+    if (only_bfact == 1) {
+    
+        gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom);
+                k_inverse_matrix_stem(k_inverse,atom,eval,evec,6,atom*3-6);
+                printf("Correlation:%f\n",correlate(k_inverse,strc_node, atom));
+                        gsl_matrix_free(k_inverse);
+                        
+    }
 	gsl_matrix_free(templaate);
 	gsl_matrix_free(inter_m);
 	gsl_matrix_free(vcon);
