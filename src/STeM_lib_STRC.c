@@ -364,9 +364,9 @@ int count_atom(char filename[100]) {
  				
  				}
  		if (ligand == 0 && all[i].atom_type == 3) {continue;}
- 		
+ 		if (k > -1) {
  		if (CA[k].node ==  all[i].node) {continue;}
- 		
+ 		}
  		++k;
  		
  		//printf("K:%d Node:%d	Atom:%d	Type:%s	Res num:%d	Res Type:%s Con:%d %d %d Type:%d Lig:%d\n",k,all[i].node,all[i].atom_number,all[i].atom_prot_type,all[i].res_number,all[i].res_type,all[i].node_c[0],all[i].node_c[1],all[i].node_c[2],all[i].atom_type,ligand);
@@ -459,13 +459,13 @@ int count_atom(char filename[100]) {
  	for (i=0;i<atom;++i) {
  		CA[all[i].node].mass += all[i].mass;
  	}
- 	for (i=0;i<k+1;++i) {
+ /*	for (i=0;i<k+1;++i) {
  		printf("CA I:%d Type:%d Node:%d Atom:%d Type:%s Res num:%d Res Type:%s Con:%d %d %d %d %d %d Cord:%f,%f,%f Mass:%f\n",i,CA[i].atom_type,CA[i].node,CA[i].atom_number,CA[i].atom_prot_type,CA[i].res_number,CA[i].res_type,CA[i].node_c[0],CA[i].node_c[1],CA[i].node_c[2],CA[i].node_c[3],CA[i].node_c[4],CA[i].node_c[5],CA[i].x_cord,CA[i].y_cord,CA[i].z_cord,CA[i].mass);
  		if (i != CA[i].node) {
  			printf(" Node don't fit ID, I last\n");
  			break;
  		}
- 	}
+ 	}*/
  	return(k+1);
  
  }
