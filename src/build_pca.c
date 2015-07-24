@@ -1,104 +1,112 @@
 #include "STeM.h"
 
-double covar(float *a,float *b,int atom) {
-	
-	double moya = 0.0;
-	double moyb = 0.0;
-	double tot = 0.0;
+float covar_vince(float *a,float *b,int atom);
+
+double vector_product(float *a,gsl_matrix *evec,int m,int atom) {
 	int i;
-	int count = 0;
-	// Moyenne de a et b
-	
-	for(i=0;i<atom;++i) {
-		if (a[i] < -9999.0 || b[i] < -9999.0) {continue;}
-		++count;
-		moya += a[i];
-		moyb += b[i];
-		//printf("	%f::%f\n",a[i],b[i]);
+	float sum = 0;
+	for (i = 0;i<atom;++i) {
+//		printf("I:%d -> %f += %f * %f\n",i,sum,a[i],gsl_matrix_get(evec,i,m));
+	if (a[i] < -9999.0) {continue;}
+		sum += a[i] * gsl_matrix_get(evec,i,m);
 	}
-	moya /= count;
-	moyb /= count;
-	//printf("Moy:%f %f\n",moya,moyb);
-	
-	for(i=0;i<atom;++i) {
-		if (a[i] < -9999.0 || b[i] < -9999.0) {continue;}
-		tot += ( a[i]-moya)*(b[i]-moyb);
-		//printf("	Tot:%f += (%f-%f)*(%f-%f) = %f\n",tot,a[i],moya,b[i],moyb,( a[i]-moya)*(b[i]-moyb));
-	}
-	
-	tot /= (count-1);
-	return(tot);
+	return(sum);
 }
+
+
 
 int main(int argc, char *argv[]) {
 	int i,j,k;
 	//int prot = 0;
+	printf("In function\n");
+	int nbrAT[5000];
 	
-	int nbrAT[argc-1];
-	int nconn[argc-1];
-	int nbrCA[argc-1];
+	int nbrCA[5000];
 	//int* align[argc-1];
-	struct pdb_atom* allpdb[argc-1];
-	struct pdb_atom* allall[argc-1];
 	
-	for (i = 1;i < argc;i++) {
-		printf("I:%d/%d %s ",i,argc,argv[i]);
-		// Build Strc principale, only CA
+	struct pdb_atom* allpdb[5000];
+	struct pdb_atom* allall[5000];
+	int toread = 0;
+	for (i = 0;i < argc;i++) {
+		if (strcmp("-il",argv[i]) == 0) {++toread;continue;}
+		if (toread == 0) {continue;}
+    printf("I:%d/%d %s\n",i,argc,argv[i]);
+    
+    // Build Strc principale, only CA
 		
-		nbrAT[i-1] = count_atom(argv[i]);
-		nconn[i-1] = count_connect(argv[i]);
+		nbrAT[toread-1] = count_atom(argv[i]);
+		int nconn = count_connect(argv[i]);
 		
-		int **connect_h=(int **)malloc(nconn[i-1]*sizeof(int *)); 
-    	for(k=0;k<nconn[i-1];k++) { connect_h[k]=(int *)malloc(6*sizeof(int));}
+		int **connect_h=(int **)malloc(nconn*sizeof(int *)); 
+    for(k=0;k<nconn;k++) { connect_h[k]=(int *)malloc(6*sizeof(int));}
+   
+    assign_connect(argv[i],connect_h);
+    
+    struct pdb_atom* strc_all;
 		
-		assign_connect(argv[i],connect_h);
-		
-		struct pdb_atom* strc_all;
-		
-		strc_all = (pdb_atom*)malloc(nbrAT[i-1]*sizeof(pdb_atom));
-		if (strc_all == NULL) {return(1);}
-		
-		nbrCA[i-1] = build_all_strc(argv[i],strc_all);
-		check_lig(strc_all,connect_h,nconn[i-1],nbrAT[i-1]);
+		strc_all = (pdb_atom*)malloc(nbrAT[toread-1]*sizeof(pdb_atom));
+		if (strc_all == NULL) {printf("Cannot assign strc\n");return(1);}
+    
+    nbrCA[toread-1] = build_all_strc(argv[i],strc_all);
+		check_lig(strc_all,connect_h,nconn,nbrAT[toread-1]);
 		
 		struct pdb_atom* strc_node;
-		strc_node = (pdb_atom*)malloc(nbrCA[i-1]*sizeof(pdb_atom));
+		strc_node = (pdb_atom*)malloc(nbrCA[toread-1]*sizeof(pdb_atom));
 		if (strc_node == NULL) {return(1);}
+		//printf("In function:%d \n",nconn[toread-1]);
+											
+		nbrCA[toread-1] = build_cord_CA(strc_all, strc_node,nbrAT[toread-1],0,connect_h,nconn);
+    
+    allpdb[toread-1] = strc_node;
 		
-		nbrCA[i-1] = build_cord_CA(strc_all, strc_node,nbrAT[i-1],0,connect_h,nconn[i-1]);
+		allall[toread-1] = strc_all;
 		
-		printf("%d %d\n",nbrCA[i-1],nbrAT[i-1]);
-		allpdb[i-1] = strc_node;
-		
-		allall[i-1] = strc_all;
-		
-		
-		
-	}
+    
+    for(k=0;k<nconn;k++) { free(connect_h[k]);}
+    free(connect_h);
+    
+    ++toread;
+   }
+   
+  printf("ALIGNING\n");
 
-	// Build total align
-	printf("ALIGNING\n");
-	int align[argc-2][1000];
-	for(i=1;i<argc-1;++i) {		
-		int align_temp[nbrCA[i]];
-		int score = node_align_low(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i-1]);
+	int **align=(int **)malloc(toread*sizeof(int *)); 
+  for(k=0;k<toread-1;k++) { align[k]=(int *)malloc(nbrCA[0]*sizeof(int));}
+
+	printf("In function\n");
+	for(i=1;i<toread-1;++i) {
+		
+		
+		int score = node_align_low(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
+		int align_temp[5000];
 		node_align_low(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
- 		printf("I:%d %s RMSD:%8.5f Score: %d/%d\n",i,argv[i+1],sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
- 		/*char temp[50];
+	
+ 		printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
+ 	/*	char temp[50];
  		sprintf(temp,"strc_%d.pdb",i);
-		write_strc(temp, allall[i],nbrAT[i]);
-		write_strc("strc_0.pdb", allall[0],nbrAT[0]);*/
+		write_strc(temp, allall[i],nbrAT[i],1);
+		write_strc("strc_0.pdb", allall[0],nbrAT[0],1);*/
 		
 	}
 	
-	// Build Array the coord
+	printf("Master ALIGNING\n");
+	
+	
 	int master_align[nbrCA[0]];
 	int index = 0;
-	float array[nbrCA[0]*3][argc-1];
-	for(i=0;i<nbrCA[0];++i) {
-		//printf("I:%d %3d%s",i,allpdb[0][i].res_number,allpdb[0][i].res_type);
+	
+	float **array=(float **)malloc(5000*sizeof(float *)); 
+  for(k=0;k<5000;k++) { array[k]=(float *)malloc(toread*sizeof(float));}
+  
+  float **array_rev=(float **)malloc(5000*sizeof(float *)); 
+  for(k=0;k<5000;k++) { array_rev[k]=(float *)malloc(toread*sizeof(float));}
+	
+	
+	
+for(i=0;i<nbrCA[0];++i) {
+	//	printf("I:%d %3d%s",i,allpdb[0][i].res_number,allpdb[0][i].res_type);
 		k=0;
-		for (j=0;j<argc-2;++j) {
+		for (j=0;j<toread-1;++j) {
 			//printf("::%3d%s ",allpdb[j+1][align[j][i]].res_number,allpdb[j+1][align[j][i]].res_type);
 			if (align[j][i] == -1) {++k;}
 		}	
@@ -118,43 +126,63 @@ int main(int argc, char *argv[]) {
 		
 
 		     
-		if (k < (argc-1) * 0.1) {
-			for(j=0;j<argc-1;++j) {
+		if (k < (toread-1) * 0.1) {
+			for(j=0;j<toread-1;++j) {
+				//printf("J:%d -> %f %f %f\n",j,allpdb[j][i].x_cord,allpdb[j][i].y_cord,allpdb[j][i].z_cord);
 				if (j == 0) {
 					array[index+0][j] = allpdb[0][i].x_cord;
 					array[index+1][j] = allpdb[0][i].y_cord;
 					array[index+2][j] = allpdb[0][i].z_cord;
+					
+					array_rev[j][index+0] = allpdb[0][i].x_cord;
+					array_rev[j][index+1] = allpdb[0][i].y_cord;
+					array_rev[j][index+2] = allpdb[0][i].z_cord;
+					
 				} else {
-					if (align[j-1][i] == -1) {
-						
+					if (align[j][i] == -1) {
+						//printf("OFF\n");
 						array[index+0][j] = -9999.9;
 						array[index+1][j] = -9999.9;
 						array[index+2][j] = -9999.9;
+						
+						array_rev[j][index+0] = -9999.9;
+						array_rev[j][index+1] = -9999.9;
+						array_rev[j][index+2] = -9999.9;
+						
 					} else {
-						array[index+0][j] = allpdb[j][align[j-1][i]].x_cord;
-						array[index+1][j] = allpdb[j][align[j-1][i]].y_cord;
-						array[index+2][j] = allpdb[j][align[j-1][i]].z_cord;
+						
+						array[index+0][j] = allpdb[j][align[j][i]].x_cord;
+						array[index+1][j] = allpdb[j][align[j][i]].y_cord;
+						array[index+2][j] = allpdb[j][align[j][i]].z_cord;
+						
+						array_rev[j][index+0] = allpdb[j][align[j][i]].x_cord;
+						array_rev[j][index+1] = allpdb[j][align[j][i]].y_cord;
+						array_rev[j][index+2] = allpdb[j][align[j][i]].z_cord;
 					}
 				}
-			//	printf("ALign:%d:: %d ==  align[%d][%d] ---- array[%d][%d] = %f\n",i,align[j-1][i],j-1,i,index,j,array[index+0][j]);
+			  //	printf("ALign:%d:: %d ==  align[%d][%d] ---- array[%d][%d] = %f\n",i,align[j][i],j,i,index,j,array[index+0][j]);
 			}
 			
 			index += 3;
 		}
 		
 	}
+	
+	
 	printf("Build Covariance matrix with index of:%d\n",index);
 	
 	gsl_matrix *cova = gsl_matrix_alloc(index,index);
 	for(i=0;i<index;++i) {
 		for (j=0;j<index;++j) {
 			// Storer dans covariance matrix au point i,j  la covariance de array[i] qui contient autant d élément que de prot
-			gsl_matrix_set(cova,i,j,covar(array[i],array[j],argc-1));
+			float myVal = covar_vince(array[i],array[j],toread-1);
+			gsl_matrix_set(cova,i,j,myVal);
 			//printf("I:%d J:%d Covar:%f\n",i,j,covar(array[i],array[j],argc-1));
 						
 		}
 	}
-	//write_matrix("covariance.mtx", cova,index,index);
+	
+	
 	printf("Diagonalyse Matrix\n");
 	
 	//Diagonalyse the matrix
@@ -179,18 +207,27 @@ int main(int argc, char *argv[]) {
 	
 	}
 	
+ 	FILE *file; /*Pointe le file défini par la fonction*/
+ 	file = fopen("project.dat","w"); /*Ouvre le fichier*/
 	for (i=0;i<10;++i) {
 		printf("I:%d %5.3f \n",i,gsl_vector_get(eval_temp,i)/tot*100);
+		
+		// Project on eigenvector
+		
+		for (k = 0 ;k<toread-1;++k) {
+			fprintf(file,"	I:%d K:%d %f\n",i,k,vector_product(array_rev[k],evec_temp,i,index));
+		}
+		
 	
 	}
-	
+	fclose(file);
 	for(j=0;j<index;++j) {
 		if (j+6 > nbrCA[0]*3-2) {break;}
 		k=0;
 		gsl_vector_set(eval,j+6,gsl_vector_get(eval_temp,j));
 		for(i=0;i<nbrCA[0];++i) {
 			//printf("I:%d Master Align:%d < %f ?\n",i,master_align[i] , (argc-1) * 0.1);
-			if (master_align[i] < (argc-1) * 0.1) {
+			if (master_align[i] < (toread-1) * 0.1) {
 				gsl_matrix_set(evec,i*3+0,j+6,gsl_matrix_get(evec_temp,k*3+0,j));
 				gsl_matrix_set(evec,i*3+1,j+6,gsl_matrix_get(evec_temp,k*3+1,j));
 				gsl_matrix_set(evec,i*3+2,j+6,gsl_matrix_get(evec_temp,k*3+2,j));
@@ -199,5 +236,47 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	write_eigen("pca_eigen.dat",evec,eval,3*nbrCA[0]);
+	
 	return(0);
+}
+
+
+
+
+
+
+
+
+
+float covar_vince(float *a,float *b,int atom) {
+	
+	float moya = 0.0;
+	float moyb = 0.0;
+	
+	int i;
+	int count = 0;
+	// Moyenne de a et b
+	
+	for(i=0;i<atom;++i) {
+		
+		if (a[i] < -9999.0 || b[i] < -9999.0) {continue;}
+		++count;
+		moya += a[i];
+		moyb += b[i];
+    //printf("	%f::%f\n",a[i],b[i]);
+	}
+	moya /= count;
+	moyb /= count;
+  //printf("Moy:%f %f\n",moya,moyb);
+	float total = 0.0;
+	float sum = 0.0;
+	for(i=0;i<atom;++i) {
+		float temp = (a[i]-moya)*(b[i]-moyb);
+		//printf("TEMP:%f\n",temp);
+		sum = sum + temp;
+		
+	}
+	//printf("THIS IS SUM:%f\n",sum);
+	total = sum;
+	return(total);
 }

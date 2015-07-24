@@ -134,7 +134,7 @@ motion.o: $I/motion.c
 rmsd.o: $I/rmsd.c
 	$(CXX) $(CXXFLAGS) -c $I/rmsd.c $(INCLUDES)
 build_pca.o: $I/build_pca.c
-	$(CXX) $(CXXFLAGS) -c $I/build_pca $(INCLUDES)
+	$(CXX) $(CXXFLAGS) -c $I/build_pca.c $(INCLUDES)
 fit_gauss.o: $I/fit_gauss.c
 	$(CXX) $(CXXFLAGS) -c $I/fit_gauss.c $(INCLUDES)
 cmp_anisou.o: $I/cmp_anisou.c

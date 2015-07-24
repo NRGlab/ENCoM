@@ -230,6 +230,8 @@ for(i=0; i < nb_atom_1; ++i) {
 	for (k = 0; k<nb_atom;k++)
 	{
 		if (newstrc[k].atom_type == 1) {fprintf(out_file,"ATOM  ");}
+		if (newstrc[k].atom_type == 4) {fprintf(out_file,"ATOM  ");}
+		if (newstrc[k].atom_type == 5) {fprintf(out_file,"HETATM");}
 	 	if (newstrc[k].atom_type == 2) {fprintf(out_file,"HETATM");}
 	 	if (newstrc[k].atom_type == 3) {fprintf(out_file,"HETATM");}
 		fprintf(out_file,"%5.d %s%s %s%4d%12.3f%8.3f%8.3f  1.00  %2.2f\n",
