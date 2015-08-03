@@ -102,8 +102,8 @@ int check_covalent_CA(struct pdb_atom *CA,struct pdb_atom *strc,int atom,int all
  			//if ((strcmp(strc[j].atom_prot_type," P   ") == 0) || (strncmp(strc[j].atom_prot_type," O3'",4) == 0)) {} else {continue;}
  			dist = (strc[i].x_cord - strc[j].x_cord)*(strc[i].x_cord - strc[j].x_cord)+(strc[i].y_cord - strc[j].y_cord)*(strc[i].y_cord - strc[j].y_cord)+(strc[i].z_cord - strc[j].z_cord)*(strc[i].z_cord - strc[j].z_cord);
  			
- 			if(6 > dist) {
- 				printf("Node:%d %dAtom:-%s-	-%s-	Dist:%f	Res:%d	%d\n",a,b,strc[i].atom_prot_type,strc[j].atom_prot_type,dist,strc[i].res_number,strc[j].res_number);
+ 			if(5 > dist) {
+ 				//printf("Node:%d %dAtom:-%s-	-%s-	Dist:%f	Res:%d	%d\n",a,b,strc[i].atom_prot_type,strc[j].atom_prot_type,dist,strc[i].res_number,strc[j].res_number);
  				
  				return(1);
  			}
@@ -460,7 +460,7 @@ int count_atom(char filename[100]) {
  		CA[all[i].node].mass += all[i].mass;
  	}
  /*	for (i=0;i<k+1;++i) {
- 		printf("CA I:%d Type:%d Node:%d Atom:%d Type:%s Res num:%d Res Type:%s Con:%d %d %d %d %d %d Cord:%f,%f,%f Mass:%f\n",i,CA[i].atom_type,CA[i].node,CA[i].atom_number,CA[i].atom_prot_type,CA[i].res_number,CA[i].res_type,CA[i].node_c[0],CA[i].node_c[1],CA[i].node_c[2],CA[i].node_c[3],CA[i].node_c[4],CA[i].node_c[5],CA[i].x_cord,CA[i].y_cord,CA[i].z_cord,CA[i].mass);
+ 		printf("CA I:%d Type:%d Node:%d Atom:%d Type:%s Res num:%d %s Res Type:%s Con:%d %d %d %d %d %d Cord:%f,%f,%f Mass:%f\n",i,CA[i].atom_type,CA[i].node,CA[i].atom_number,CA[i].atom_prot_type,CA[i].res_number,CA[i].chain,CA[i].res_type,CA[i].node_c[0],CA[i].node_c[1],CA[i].node_c[2],CA[i].node_c[3],CA[i].node_c[4],CA[i].node_c[5],CA[i].x_cord,CA[i].y_cord,CA[i].z_cord,CA[i].mass);
  		if (i != CA[i].node) {
  			printf(" Node don't fit ID, I last\n");
  			break;
@@ -648,6 +648,7 @@ int count_atom(char filename[100]) {
  		
  		if ((line[17] == 'A' || line[17] == 'U'|| line[17] == 'G'||line[17] == 'T' ||line[17] == 'C') && line[18] == ' ' && line[19] == ' ') {structure[index].atom_type = 4;}
  		if ((line[19] == 'A' || line[19] == 'U'|| line[19] == 'G'||line[19] == 'T' ||line[19] == 'C') && line[18] == ' ' && line[17] == ' ') {structure[index].atom_type = 4;}
+ 		if ((line[19] == 'A' || line[19] == 'U'|| line[19] == 'G'||line[19] == 'T' ||line[19] == 'C') && line[18] == 'D' && line[17] == ' ') {structure[index].atom_type = 4;}
  		
  		// Scan pour des chiffres de residus, b-factor,coord, atom 
 			// Reset les valeurs	 		
