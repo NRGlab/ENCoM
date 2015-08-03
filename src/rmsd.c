@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
  	char check_name[500];
  	char out_name[500];
  	int verbose = 0;
-	int i;
+	int i,j;
 	int lig = 0;
 	int resnumc_flag = 0;
 	int nconn;
@@ -333,6 +333,61 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	
+	// Regarde les surfaces en contact conserv
+	
+	gsl_matrix *inter_m = gsl_matrix_alloc(8,8);
+	gsl_matrix_set_all(inter_m,1.0);
+	
+	
+	// Init
+	
+	gsl_matrix *vcon = gsl_matrix_alloc(all,all);
+	gsl_matrix *templaate = gsl_matrix_alloc(atom*3, atom*3);
+
+	gsl_matrix_set_all(templaate,0.0);
+	gsl_matrix_set_all(vcon,0.0);
+
+	assign_atom_type(strc_all, all);
+	vcon_file_dom(strc_all,vcon,all);
+	all_interaction(strc_all,all, atom, templaate,lig,vcon,inter_m,strc_node);
+
+	// Target
+	
+	gsl_matrix *vcon_t = gsl_matrix_alloc(all_t,all_t);
+	gsl_matrix *templaate_t = gsl_matrix_alloc(atom_t*3, atom_t*3);
+	
+	gsl_matrix_set_all(templaate_t,0.0);
+	gsl_matrix_set_all(vcon_t,0.0);
+
+	assign_atom_type(strc_all_t, all_t);
+	vcon_file_dom(strc_all_t,vcon_t,all_t);
+	all_interaction(strc_all_t,all_t, atom_t, templaate_t,lig,vcon_t,inter_m,strc_node_t);
+	float sum = 0.0;
+	int count = 0;
+	
+	int tam[4];
+	tam[0] = 0; // TP
+	tam[1] = 0; // FP
+	tam[2] = 0; // TN
+	tam[3] = 0; // FN
+	
+	for(i=0;i<atom;++i) {
+		if (align[i] == -1) {continue;}
+		for(j=i;j<atom;++j) {
+			if (abs(i-j) < 5) {continue;}
+			if (align[j] == -1) {continue;}
+			sum += pow(gsl_matrix_get(templaate,i,j) - gsl_matrix_get(templaate_t,align[i],align[j]),2);
+			++count;
+			
+			if (gsl_matrix_get(templaate,i,j) > 10 && gsl_matrix_get(templaate_t,align[i],align[j]) > 10) {++tam[0];}
+			if (gsl_matrix_get(templaate,i,j) < 10 && gsl_matrix_get(templaate_t,align[i],align[j]) > 10) {++tam[1];}
+			if (gsl_matrix_get(templaate,i,j) < 10 && gsl_matrix_get(templaate_t,align[i],align[j]) < 10) {++tam[2];}
+			if (gsl_matrix_get(templaate,i,j) > 10 && gsl_matrix_get(templaate_t,align[i],align[j]) < 10) {++tam[3];}
+			
+		}
+	}
+	printf("Vcon_RMSD=%f\n",sqrt(sum/count));
+	printf("TP:%d\nFP:%d\nTN:%d\nFN:%d\n",tam[0],tam[1],tam[2],tam[3]);
 	return(1);
  	
  	
