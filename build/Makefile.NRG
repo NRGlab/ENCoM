@@ -37,7 +37,7 @@ OBJ =   STeM_lib_grid_motion.o                   \
         STeM_lib_template.o            \
         STeM_lib_vcon.o
 
-all: build_encom b_factor bfactor_diff build_grid_rmsd fit_svd motion rmsd fit_prob find_rel anm cmp_eigen fit_gauss cmp_anisou AniCleft build_gauss find_inter get_networks comp_networks AniRMSD AniPair LeSTATIUM
+all: build_encom b_factor bfactor_diff build_grid_rmsd fit_svd motion rmsd fit_prob find_rel anm cmp_eigen fit_gauss cmp_anisou AniCleft build_gauss find_inter get_networks comp_networks AniRMSD AniPair LeSTATIUM build_pca
 	\mv build_encom $W/build_encom
 	\mv b_factor $W/b_factor
 	\mv bfactor_diff $W/bfactor_diff
@@ -59,6 +59,7 @@ all: build_encom b_factor bfactor_diff build_grid_rmsd fit_svd motion rmsd fit_p
 	\mv AniRMSD $W/AniRMSD
 	\mv AniPair $W/AniPair
 	\mv LeSTATIUM $W/LeSTATIUM
+	\mv build_pca $W/build_pca
 
 clean:
 	\rm -f $W/build_encom core *~ $I/*~ $W/*~ *.o a.out
@@ -134,7 +135,7 @@ motion.o: $I/motion.c
 rmsd.o: $I/rmsd.c
 	$(CXX) $(CXXFLAGS) -c $I/rmsd.c $(INCLUDES)
 build_pca.o: $I/build_pca.c
-	$(CXX) $(CXXFLAGS) -c $I/build_pca $(INCLUDES)
+	$(CXX) $(CXXFLAGS) -c $I/build_pca.c $(INCLUDES)
 fit_gauss.o: $I/fit_gauss.c
 	$(CXX) $(CXXFLAGS) -c $I/fit_gauss.c $(INCLUDES)
 cmp_anisou.o: $I/cmp_anisou.c

@@ -137,7 +137,8 @@ int node_align_lig(struct pdb_atom *strc,int atom,struct pdb_atom *strc_t,int at
 	int i,j,k = 0;
 	int score = 0;
 	// Fonction qui ne garde que les aa aligne autour du ligand de la TARG
-	
+	int reverse = 0;
+	if (cutoff < 0) {cutoff = -cutoff; reverse = 1;}
 	float coord[200][3]; // Array qui va comprendre les coordone du ligand
 	
 	// On trouve les ligands et coordone storer dans coord
@@ -182,12 +183,13 @@ int node_align_lig(struct pdb_atom *strc,int atom,struct pdb_atom *strc_t,int at
 			dist += (coord[j][2] - strc_all_t[i].z_cord)*(coord[j][2] - strc_all_t[i].z_cord);
 			/*printf("K:%d Dist = %.3f (%.3f,%.3f,%.3f) (%.3f,%.3f,%.3f)\n",k,dist,coord[j][0],coord[j][1],coord[j][2],strc_all_t[i].x_cord,strc_all_t[i].y_cord,strc_all_t[i].z_cord);
 			printf("%f < %f\n",dist,cutoff*cutoff);*/
-			if (dist < cutoff*cutoff) {
+			if (dist < cutoff*cutoff ) {
 					//printf("I add I:%d L:%d Node:%d %s %d %s\n",i,l,strc_all_t[i].node,strc_all_t[i].res_type,strc_all_t[i].res_number,strc_all_t[i].chain);
 					kept_node[l] = strc_all_t[i].node;
 					++l;
 					break;
 			}
+			
 		}
 	
 	}
@@ -200,15 +202,27 @@ int node_align_lig(struct pdb_atom *strc,int atom,struct pdb_atom *strc_t,int at
 		if (align[i] == -1) {continue;}
 		for (j=0;j<l;++j) {
 			if (strc_t[align[i]].node == kept_node[j]) {
-				//printf("%d :: %d Init: %s%d%s :: %s%d%s :Targ\n",i,align[i],strc[i].res_type,strc[i].res_number,strc[i].chain,strc_t[align[i]].res_type,strc_t[align[i]].res_number,strc_t[align[i]].chain);
+			//	printf("%d :: %d Init: %s%d%s :: %s%d%s :Targ\n",i,align[i],strc[i].res_type,strc[i].res_number,strc[i].chain,strc_t[align[i]].res_type,strc_t[align[i]].res_number,strc_t[align[i]].chain);
 				++flag;
 			}
 		}
-		if (flag == 0) {
-			align[i] = -1;
+		// Flag == 0 veut dire qu'en bas du threshold
+		// Si on veut le reverse, flag == 0  veut dire en haut du threshold
+		if (reverse == 0) {
+			if (flag == 0) {
+				align[i] = -1;
+			} else {
+				++score;
+			}
 		} else {
-			++score;
+			if (flag != 0) {
+				align[i] = -1;
+			} else {
+				++score;
+			}
+		
 		}
+		
 	}
 	
 	return(score);
@@ -509,6 +523,9 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  		t_init[k].y_cord = init[i].y_cord;
  		t_init[k].z_cord = init[i].z_cord;
  		
+ 		t_init[k].res_number = init[i].res_number;
+ 		
+ 		
  		t_targ[k].x_cord = targ[d].x_cord;
  		t_targ[k].y_cord = targ[d].y_cord;
  		t_targ[k].z_cord = targ[d].z_cord;
@@ -574,6 +591,8 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  	multiplie_matrix(targ_v,3,t_atom,init_v,t_atom,3,corr);
 
  	gsl_linalg_SV_decomp (corr, mat_v,vec_s,vec_w);
+ 	printf("DET:%g\n",gsl_matrix_Det3D(corr));
+
 	//gsl_linalg_SV_decomp_jacobi (corr, mat_v, vec_s);
  	
  	// Multipli les matrix
@@ -594,6 +613,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  				 (t_init[i].y_cord-t_targ[i].y_cord)*(t_init[i].y_cord-t_targ[i].y_cord)+
  				 (t_init[i].z_cord-t_targ[i].z_cord)*(t_init[i].z_cord-t_targ[i].z_cord));
  		rmsd += dist;
+ 		//printf("I:%d Res:%d Dist:%f RMSD:%f Atom:%d\n",i,t_init[i].res_number,dist,rmsd,i);
  				 if (dist > max_displacement) {max_displacement = dist;}
  	}
  	//printf("Max_displacement:%.4f\n",sqrt(max_displacement));
@@ -1335,7 +1355,8 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 		amp[i]  = 0;
 		namp[i] = 0;
 	}
-	
+	FILE *file;
+ 	file = fopen("fit_svd.pdb","w");
 
 	for(j = 0;j<nb_mode;++j) {
 		//printf("J:%d\n",j);
@@ -1350,12 +1371,21 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 	 		
 	 		for(l=0;l<nb_mode;++l) {
 	 			apply_eigen(store_init,atom,eval,mode+l,namp[l]);
+	 			
 	 		}
 		 	
 	 		newstrc = rmsd_no(store_init,targ,atom,align);
 	 		if (i == 0) {old = newstrc+1;}
-	 		if (step < 0.0001 && step > -0.0001) {amp[j] = namp[j];printf("%3d Mode:%4d Amp:%7.4f	Step:%7.4f	RMSD:%10.9f\n",i,mode+j+1,namp[j],step,sqrt(newstrc));break;}
-	 		//
+	 		if (step < 0.0001 && step > -0.0001) {
+	 			amp[j] = namp[j];
+	 			apply_eigen(all_init,all,eval,mode+j,namp[j]);
+	 			printf("%3d Mode:%4d Amp:%7.4f	Step:%7.4f	RMSD:%10.9f\n",i,mode+j+1,namp[j],step,sqrt(newstrc));
+	 			
+	 			write_movie(file,all_init,all,j);
+	 			
+	 			break;
+	 		}
+	 		
 	 		if (i > nb_mode * atom *100) {break;}
 			if (old < newstrc) {step = -step/10;}
 			//if (old == newstrc && i > 4) {amp[j] = namp[j];break;}
@@ -1363,6 +1393,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 	 		namp[j] += step;
 		}
 	}
+	fclose(file);
 	// Monte Carlo Approch
 	/*for(i=0;i<nb_mode;++i) {
 		amp[i] = namp[i];

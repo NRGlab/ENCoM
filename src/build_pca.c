@@ -19,13 +19,14 @@ int main(int argc, char *argv[]) {
 	int i,j,k;
 	//int prot = 0;
 	printf("In function\n");
-	int nbrAT[2000];
+
+	int nbrAT[5000];
 	
-	int nbrCA[2000];
+	int nbrCA[5000];
 	//int* align[argc-1];
 	
-	struct pdb_atom* allpdb[2000];
-	struct pdb_atom* allall[2000];
+	struct pdb_atom* allpdb[5000];
+	struct pdb_atom* allall[5000];
 	int toread = 0;
 	for (i = 0;i < argc;i++) {
 		if (strcmp("-il",argv[i]) == 0) {++toread;continue;}
@@ -95,11 +96,12 @@ int main(int argc, char *argv[]) {
 	int master_align[nbrCA[0]];
 	int index = 0;
 	
-	float **array=(float **)malloc(2000*sizeof(float *)); 
-  for(k=0;k<2000;k++) { array[k]=(float *)malloc(toread*sizeof(float));}
+
+	float **array=(float **)malloc(5000*sizeof(float *)); 
+  for(k=0;k<5000;k++) { array[k]=(float *)malloc(toread*sizeof(float));}
   
-  float **array_rev=(float **)malloc(2000*sizeof(float *)); 
-  for(k=0;k<2000;k++) { array_rev[k]=(float *)malloc(toread*sizeof(float));}
+  float **array_rev=(float **)malloc(5000*sizeof(float *)); 
+  for(k=0;k<5000;k++) { array_rev[k]=(float *)malloc(toread*sizeof(float));}
 	
 	
 	

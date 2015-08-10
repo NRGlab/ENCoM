@@ -74,8 +74,13 @@ float over_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int aa,int bb) {
  	for(i=0;i<atom;++i) {
  		
  		
-	 		x = gsl_matrix_get(evec,i,aa)*la;
-	 		z = gsl_matrix_get(pca ,i,bb)*lb;
+// <<<<<<< HEAD
+// 	 		x = gsl_matrix_get(evec,i,aa)*la;
+// 	 		z = gsl_matrix_get(pca ,i,bb)*lb;
+// =======
+	 		x = gsl_matrix_get(evec,i,aa)/la;
+	 		z = gsl_matrix_get(pca ,i,bb)/lb;
+// >>>>>>> master
 	 		if (z == 0) {continue;}
 			a += x*z;
 	 	
