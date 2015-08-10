@@ -29,9 +29,9 @@ int node_align(struct pdb_atom *strc,int atom,struct pdb_atom *strc_t,int atom_t
 			if((strcmp(strc[i].res_type,strc_t[j].res_type) == 0) && 
 				(strc[i].res_number == strc_t[j].res_number) && 
 				(strcmp(strc[i].chain,strc_t[j].chain) == 0) &&
-				strc[i].atom_type == 1 && strc_t[j].atom_type == 1
+				(strc[i].atom_type == 1 || strc[i].atom_type == 4) && (strc_t[j].atom_type == 1 || strc_t[j].atom_type == 4))
 				
-			)
+			
 			{
 				if (align[i] == -1) {++score; align[i] = j;}
 			}

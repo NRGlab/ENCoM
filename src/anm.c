@@ -105,7 +105,8 @@ int main(int argc, char *argv[]) {
 	if (verbose == 1) {printf("\tNon Local Interaction Potential\n");}	
 	gsl_matrix *templaate = gsl_matrix_alloc(3*atom, 3*atom);
 	gsl_matrix_set_all(templaate,1);
-	build_enm(strc_node,hessian,atom,templaate,cutoff,pfanm);	
+	if (false) {load_matrix(templaate, "template_name");} // matrice n X n séparée par des tabs
+	build_enm(strc_node,hessian,atom,templaate,cutoff,pfanm);	// modidfier templaate, mettre cutoff énorme, pfanm à 0
  	if (verbose == 1) {printf("\tAssigning Array\n");}	
 	assignArray(h_matrix,hessian,3*atom,3*atom);
 
@@ -135,6 +136,12 @@ int main(int argc, char *argv[]) {
  	float ener = calc_energy(atom,eval,temperature);
  	printf("Energy:%10.8f\n",ener);
  	printf("Energy/node:%10.8f\n",ener/(float)(atom*3));
+ 	// addition pour printer la correlation
+ 	gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom);
+	k_inverse_matrix_stem(k_inverse,atom,eval,evec,6,atom*3-6);
+
+	printf("Correlation:%f\n",correlate(k_inverse,strc_node, atom));
+	gsl_matrix_free(k_inverse);
  
  	
  	gsl_matrix_free(templaate);
