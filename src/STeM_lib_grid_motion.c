@@ -56,7 +56,7 @@ void write_matrix_pdb(char filename[100], gsl_matrix *m,int nb_atom,int nb_atom_
  		temp = l;
  		amplitude = sin(temp*pi/15)*(max-min)/2+(max+min)/2;
  		//printf("Frame:%2d\tAmplitude:%f\n",l+1,amplitude);
- 		fprintf(out_file,"Model %d\n",l+1);
+ 		fprintf(out_file,"MODEL     %4d\n",l+1);
 		// Nous avons une nouvelle strucuture qui va être eigen bouger
 		
 	 	for (k=0;k<atom;++k) {
@@ -78,7 +78,7 @@ void write_matrix_pdb(char filename[100], gsl_matrix *m,int nb_atom,int nb_atom_
 	 		if (strcmp(newstrc[k].res_type,"HOH") == 0) {continue;}
 	 		if (old[k].atom_type == 1 || old[k].atom_type == 4 )  {fprintf(out_file,"ATOM  ");}
 	 		if (old[k].atom_type == 3 || old[k].atom_type == 2 || old[k].atom_type == 5) {fprintf(out_file,"HETATM");}
-	 		fprintf(out_file,"%5.d %s%s %s%4d%12.3f%8.3f%8.3f  1.00  %3.2f\n",
+	 		fprintf(out_file,"%5.d %s%s %s%4d%12.3f%8.3f%8.3f  1.00  %3.2f             \n",
 	 			old[k].atom_number,
 	 			old[k].atom_prot_type,
 	 			old[k].res_type,

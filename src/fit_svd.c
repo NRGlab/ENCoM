@@ -37,6 +37,8 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-angle",argv[i]) == 0) {torsion = 1;}
  		if (strcmp("-iterative",argv[i]) == 0) {iterative_flag = 1;}
  		if (strcmp("-resnumc",argv[i]) == 0) {resnumc_flag = 1;} 
+ 		if (strcmp("-num",argv[i]) == 0) {resnumc_flag = 2;} 
+
  		if (strcmp("-final",argv[i]) == 0) {output_final = 1;} 
  	}
  	
@@ -132,6 +134,21 @@ int main(int argc, char *argv[]) {
  		printf("Low Score... Will try an homemade alignement !!!\n");
  		score = node_align_low(strc_node,atom,strc_node_t,atom_t,align);
  		
+ 	}
+ 	if (resnumc_flag == 2) {
+ 		// Align only based on number (pour GPCR renumber)
+ 		for(i=0;i<atom;++i) {align[i] = -1;}
+ 		score = 0;
+ 		for(i=0;i<atom;++i) {
+ 			if (strc_node[i].atom_type == 3) {continue;}
+ 			int j;
+ 			for(j = 0;j<atom_t;++j) {
+ 				if (strc_node_t[j].atom_type == 3) {continue;}
+ 				if (strc_node[i].res_number == strc_node_t[j].res_number) {align[i] = j;++score;break;}
+ 				
+ 			}
+ 		}
+ 		printf("Only num RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);
  	}
 	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);	
 	if (ligalign > 0) {

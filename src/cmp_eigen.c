@@ -53,14 +53,22 @@ float corr_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int a,int b) {
 
 }
 
-float over_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int aa,int bb) {
+float over_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int aa,int bb, struct pdb_atom *strc_node) {
 	int i;
+	int i_node;
 	float a = 0.00000;
  	float x = 0.000000,z=0.00000;
  	float la=0.0000000000,lb=0.000000000;
  	// Caculate lenght (because of the vector reject)
  	
  	for(i=0;i<atom;++i) {
+ 		if (i % 3 == 0) {
+ 			i_node = i/3; // 3 eigenvectors par node
+ 			if (strc_node[i_node].atom_type == 4 && strncmp(strc_node[i_node].atom_prot_type," P  ",4) !=0) {
+ 				i += 2;
+ 				continue;
+ 			}
+ 		} 
  		if (gsl_matrix_get(pca,i,aa) == 0) {continue;}
  		//printf("I COMPARE: %f et %f\n",gsl_matrix_get(evec,i,aa),gsl_matrix_get(pca,i,bb));
  		la += gsl_matrix_get(evec,i,aa)*gsl_matrix_get(evec,i,aa);
@@ -72,14 +80,20 @@ float over_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int aa,int bb) {
  	lb = sqrt(lb);
  	//printf("La:%f Lb:%f\n",la,lb);
  	for(i=0;i<atom;++i) {
- 		
+ 		if (i % 3 == 0) {
+ 			i_node = i/3; // 3 eigenvectors par node
+ 			if (strc_node[i_node].atom_type == 4 && strncmp(strc_node[i_node].atom_prot_type," P  ",4) !=0) {
+ 				i += 2;
+ 				continue;
+ 			}
+ 		} 
  		
 // <<<<<<< HEAD
-// 	 		x = gsl_matrix_get(evec,i,aa)*la;
-// 	 		z = gsl_matrix_get(pca ,i,bb)*lb;
+//	 		x = gsl_matrix_get(evec,i,aa)*la;
+//	 		z = gsl_matrix_get(pca ,i,bb)*lb;
 // =======
-	 		x = gsl_matrix_get(evec,i,aa)/la;
-	 		z = gsl_matrix_get(pca ,i,bb)/lb;
+	 		 x = gsl_matrix_get(evec,i,aa);
+	 		 z = gsl_matrix_get(pca ,i,bb);
 // >>>>>>> master
 	 		if (z == 0) {continue;}
 			a += x*z;
@@ -87,7 +101,7 @@ float over_eigen(gsl_matrix *evec,gsl_matrix *pca,int atom,int aa,int bb) {
  	}
  	
  	
- 	return(a/(la*lb));
+ 	return(a/(lb*la));
 
 }
 
@@ -172,7 +186,7 @@ int main(int argc, char *argv[]) {
 	//float overlap;
 	for(i=mode-1;i<nm+mode-1;++i) {
 		for(j=mode-1;j<nm+mode-1;++j) {
-			corr = over_eigen(evec,evecpca,atom[0],i,j);
+			corr = over_eigen(evec,evecpca,atom[0],i,j, strc_node);
 			
 			
 				printf("I:%3d J:%3d %8.5f Val %8.5f :: %8.5f\n",i,j,corr*corr,gsl_vector_get(eval,i),gsl_vector_get(evalpca,j));

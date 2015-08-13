@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
 	for(i=1;i<toread-1;++i) {
 		
 		
-		int score = node_align_low(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
+		int score = node_align(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
 		int align_temp[5000];
-		node_align_low(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
+		node_align(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
 	
  		printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
  	/*	char temp[50];

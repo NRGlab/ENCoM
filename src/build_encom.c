@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
  		
  	}
  	int count = 0;
- 	printf("\n***********bitch*********\nFile:%s\nAlpha1:%f\nAlpha2:%f\nAlpha3:%f\nAlpha4:%f\nAlpha5:%f\n********************\n",
+ 	printf("\n***********ARNMajor*********\nFile:%s\nAlpha1:%f\nAlpha2:%f\nAlpha3:%f\nAlpha4:%f\nAlpha5:%f\n********************\n",
  	file_name[0],bond_factor,angle_factor,kp_factor,init_templaate,vinit);
  	
  	//***************************************************
