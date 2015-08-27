@@ -517,6 +517,63 @@ void all_interaction(struct pdb_atom *strc,int atom,int res_n, gsl_matrix *ma, i
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 	 	}
+
+	 	if (strc[k].atom_type == 4) { // Assignation des atom types pour l'ARN.
+	 		//basés sur SOBOLEV ET AL., p.122, LIGIN classes
+
+	 		//types spécifiques aux bases
+	 		if (strncmp(strc[k].res_type,"  A",4) == 0) {
+				if (strncmp(strc[k].atom_prot_type," N1 ",4) == 0)	{strc[k].type = 2;}
+	 		}
+	 		if (strncmp(strc[k].res_type,"  G",4) == 0) {
+				if (strncmp(strc[k].atom_prot_type," N1 ",4) == 0)	{strc[k].type = 3;}
+	 		}
+	 		if (strncmp(strc[k].res_type,"  C",4) == 0) {
+				if (strncmp(strc[k].atom_prot_type," N1 ",4) == 0)	{strc[k].type = 6;}
+				if (strncmp(strc[k].atom_prot_type," N5 ",4) == 0)	{strc[k].type = 2;}
+	 		}
+	 		if (strncmp(strc[k].res_type,"  U",4) == 0) {
+				if (strncmp(strc[k].atom_prot_type," N1 ",4) == 0)	{strc[k].type = 6;}
+				if (strncmp(strc[k].atom_prot_type," N5 ",4) == 0)	{strc[k].type = 3;}
+	 		}
+
+	 		//Types généraux
+	 		//Atomes de la base
+	 		//carbones
+	 		if (strncmp(strc[k].atom_prot_type," C2 ",4) == 0)	{strc[k].type = 5;}
+	 		if (strncmp(strc[k].atom_prot_type," C3 ",4) == 0)	{strc[k].type = 5;}
+	 		if (strncmp(strc[k].atom_prot_type," C4 ",4) == 0)	{strc[k].type = 5;}
+	 		if (strncmp(strc[k].atom_prot_type," C5 ",4) == 0)	{strc[k].type = 5;}
+	 		if (strncmp(strc[k].atom_prot_type," C6 ",4) == 0)	{strc[k].type = 5;}
+	 		if (strncmp(strc[k].atom_prot_type," C8 ",4) == 0)	{strc[k].type = 5;}
+	 		//azotes
+	 		if (strncmp(strc[k].atom_prot_type," N2 ",4) == 0)	{strc[k].type = 3;}
+	 		if (strncmp(strc[k].atom_prot_type," N3 ",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," N4 ",4) == 0)	{strc[k].type = 3;}
+	 		if (strncmp(strc[k].atom_prot_type," N6 ",4) == 0)	{strc[k].type = 3;}
+	 		if (strncmp(strc[k].atom_prot_type," N7 ",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," N9 ",4) == 0)	{strc[k].type = 6;}
+
+	 		//Atomes du sucre
+	 		//carbones
+	 		if (strncmp(strc[k].atom_prot_type," C1'",4) == 0)	{strc[k].type = 8;}
+	 		if (strncmp(strc[k].atom_prot_type," C2'",4) == 0)	{strc[k].type = 6;}
+	 		if (strncmp(strc[k].atom_prot_type," C3'",4) == 0)	{strc[k].type = 8;}
+	 		if (strncmp(strc[k].atom_prot_type," C4'",4) == 0)	{strc[k].type = 8;}
+	 		if (strncmp(strc[k].atom_prot_type," C5'",4) == 0)	{strc[k].type = 8;}
+	 		//oxygenes
+	 		if (strncmp(strc[k].atom_prot_type," O4'",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," O2'",4) == 0)	{strc[k].type = 1;}
+
+	 		//Atomes du phosphate
+	 		if (strncmp(strc[k].atom_prot_type," P  ",4) == 0)	{strc[k].type = 8;}
+	 		if (strncmp(strc[k].atom_prot_type," OP1",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," OP2",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," OP3",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," O5'",4) == 0)	{strc[k].type = 2;}
+	 		if (strncmp(strc[k].atom_prot_type," O3'",4) == 0)	{strc[k].type = 2;}
+
+	 	}
 	 	//if (strc[k].type == 0) {printf("Res:%s\tAtom Type:-%s-\tType:%d\tK:%d\tAtom:%d\n",strc[k].res_type,strc[k].atom_prot_type,strc[k].type,k,strc[k].atom_number);}
 	 }
  }

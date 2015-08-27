@@ -148,6 +148,8 @@ int main(int argc, char *argv[]) {
  				
  			}
  		}
+ 		for (i=0;i<atom;i++){if (strc_node[i].atom_type == 4 && strncmp(strc_node[i].atom_prot_type," P  ",4) != 0) {align[i]= -1;}} // added for bfact
+
  		printf("Only num RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);
  	}
 	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);	
