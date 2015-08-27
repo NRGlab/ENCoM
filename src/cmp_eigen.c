@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
 	atom_strc = build_cord_CA(strc_all, strc_node,all,lig,connect_h,nconn);
 	if (verbose == 1) {printf("	Assign Node:%d\n",atom_strc);}
 	
-	
+	if (verbose == 1) {printf("Open eigen 1:%s\n",eigen_name);}
 	
 	atom[0] = count_eigen(eigen_name);
 	
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 	gsl_matrix *evec = gsl_matrix_alloc (atom[0],atom[0]);
 	
 	load_eigen(eval,evec,eigen_name,atom[0]);
-	
+	if (verbose == 1) {printf("Open eigen 2:%s\n",pca_name);}
 	atom[1] = count_eigen(pca_name);
 	
 	gsl_vector *evalpca = gsl_vector_alloc(atom[1]);

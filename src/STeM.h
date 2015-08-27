@@ -138,7 +138,7 @@ void k_tot_inv_matrix_stem(gsl_matrix *m,int nb_atom, gsl_vector *evl,gsl_matrix
 void k_cov_inv_matrix_stem(gsl_matrix *m,int nb_atom, gsl_vector *evl,gsl_matrix *evc,int mode,int nm);
 void buid_pre(gsl_matrix *m,gsl_matrix *evc,int nb_atom);
 void k_inverse_matrix_stem_temp(gsl_matrix *m,int nb_atom, gsl_vector *evl,gsl_matrix *evc);
-float calc_energy(int atom,gsl_vector *eval,float t);
+float calc_energy(int atom,gsl_vector *eval,float t,int m);
 void assign_anisou_all(struct pdb_atom *init,int atom,struct pdb_atom *strc,int all, int ihess);
 
 // STeM_lib_rot.c

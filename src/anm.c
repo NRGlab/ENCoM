@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 
 
 		 	
- 	float ener = calc_energy(atom,eval,temperature);
+ 	float ener = calc_energy(atom,eval,temperature,6);
  	printf("Energy:%10.8f\n",ener);
  	printf("Energy/node:%10.8f\n",ener/(float)(atom*3));
  	// addition pour printer la correlation
