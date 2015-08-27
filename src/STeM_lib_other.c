@@ -445,6 +445,7 @@ for(i=0; i < nb_atom_1; ++i) {
  	float diff = 0;
  	for (i=0;i<atom;++i) {
  		if (strc[i].atom_type == 3){continue;}
+ 		if (strc[i].atom_type == 4 && strncmp(strc[i].atom_prot_type," P  ",4) != 0) {continue;}
  		++c;
  		moy_x += gsl_matrix_get(m,i,i);
  		moy_y += strc[i].b_factor;
@@ -644,7 +645,7 @@ long time_seed(){
   return s;
 }
 
-float calc_energy(int atom,gsl_vector *eval,float t) {
+float calc_energy(int atom,gsl_vector *eval,float t,int m) {
 	int i;
 	double ental=0.00000;
 	double entro=0.00000;
@@ -657,7 +658,7 @@ float calc_energy(int atom,gsl_vector *eval,float t) {
 	double k = 1.3806503 *pow(10,-23);
 	double R= 8.31447;
 	double sum = 0.000000000;
-	for (i = 6;i<atom*3;++i) {
+	for (i = m;i<atom*3;++i) {
 		v = gsl_vector_get(eval,i);
 		//printf("V:%f\n",v);
 		power = pow(e,-h*v/(k*t));
@@ -665,7 +666,7 @@ float calc_energy(int atom,gsl_vector *eval,float t) {
 		float rond = h*v/k;
 		//entro += -R * log(1-power)+(Na*h*v*power)/(t*(1-power));
 		entro += (rond/t)/(pow(e,rond/t)-1)-log(1-pow(e,-rond/t));
-		sum += log(v);
+		sum += log(1.0/v);
 	}
 	
 	//printf("Ental contribution:%f\n",ental/1000);

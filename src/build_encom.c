@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 	int covariance_flag = 0;
 	int total_model = 0;
 	float noligand = -1;
+	int starting_mode = 6;
  	for (i = 1;i < argc;i++) {
  		if (strcmp("-il",argv[i]) == 0) {
  			while (strncmp(argv[i+1+total_model],".pdb",4)>0) {
@@ -56,6 +57,7 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-v",argv[i]) == 0) {verbose = 1;}
  		if (strcmp("-lig",argv[i]) == 0) {lig= 1;}
  		if (strcmp("-m",argv[i]) == 0) {strcpy(matrix_name,argv[i+1]);}
+ 		if (strcmp("-sm",argv[i]) == 0) {int temp;sscanf(argv[i+1],"%d",&temp);starting_mode = temp;}
  		if (strcmp("-param",argv[i]) == 0) {strcpy(param_name,argv[i+1]);}
  		if (strcmp("-init",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);vinit = temp;}
  		if (strcmp("-t",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);init_templaate = temp;} 
@@ -211,7 +213,7 @@ int main(int argc, char *argv[]) {
 		// Combien de ligand node
 		int atom_no_lig = 0;
 		for(i=0;i<atom;++i) {
-			if (strc_node[i].atom_type != 3) {
+			if (strc_node[i].atom_type != 3 && strc_node[i].atom_type != 4) {
 				++atom_no_lig;
 				
 				// On veut enlever un cutoff autour du ligand
@@ -229,13 +231,13 @@ int main(int argc, char *argv[]) {
 		int k,h;
 		for (i=0;i<atom;++i) {
 			j_count = 0;
-			if (strc_node[i].atom_type == 3) {continue;}
+			if (strc_node[i].atom_type == 3 || strc_node[i].atom_type == 4) {continue;}
 			for (j=0;j<atom;++j) {
-				if (strc_node[j].atom_type == 3) {continue;}
-				
+				if (strc_node[j].atom_type == 3 || strc_node[j].atom_type == 4) {continue;}
+				//printf("I:%d (%d) J:%d (%d) -> Type:\n",i_count,i,j_count,j.);
 				for(k=0;k<3;++k) {
 					for (h=0;h<3;++h) {
-					//	if (i == 0 && j == 0) {printf("(%d,%d) = (%d,%d)\n",3*i_count+k,3*j_count+h,3*i+k,3*j+h);}
+						//printf("%d et %d -> (%d,%d) = (%d,%d)\n",i_count,j_count,3*i_count+k,3*j_count+h,3*i+k,3*j+h);
 						gsl_matrix_set(h_matrix_no_lig,3*i_count+k,3*j_count+h,gsl_matrix_get(h_matrix,3*i+k,3*j+h));
 					}
 				}
@@ -289,14 +291,14 @@ int main(int argc, char *argv[]) {
 	if (temperature  < 0) {
 		float factor;
 		for(factor = -2000.0;factor < 2000.0;++factor) {
-			calc_energy(atom,eval,300.0-factor/1000.0);
+			calc_energy(atom,eval,300.0-factor/1000.0,starting_mode);
 		}
 		for(factor = -300.0;factor < 300;++factor) {
-			calc_energy(atom,eval,300.0-factor/10.0);
+			calc_energy(atom,eval,300.0-factor/10.0,starting_mode);
 		}
 	
 	} else {
-			ener = calc_energy(atom,eval,temperature);
+			ener = calc_energy(atom,eval,temperature,starting_mode);
 			printf("Energy:%10.8f\n",ener);
 			printf("Energy/node:%10.8f\n",ener/(float)(atom*3));
 	}
@@ -314,7 +316,7 @@ int main(int argc, char *argv[]) {
 	if (covariance_flag > 0) 
 	{
 		gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom);
-		k_inverse_matrix_stem(k_inverse,atom,eval,evec,6,atom*3-6);
+		k_inverse_matrix_stem(k_inverse,atom,eval,evec,starting_mode,atom*3-6);
 	//	k_tot_inv_matrix_stem(k_inverse,atom,eval,evec,6,atom);
 		FILE *file;
  		file = fopen(covariance_name,"w");
@@ -330,8 +332,14 @@ int main(int argc, char *argv[]) {
 				,gsl_matrix_get(k_inverse,i,j)*1000);
 			}	
 		}
-	
+		gsl_matrix_scale(k_inverse, 1000.0);
 		printf("Correlation:%f\n",correlate(k_inverse,strc_node, atom));
+		gsl_permutation * p = gsl_permutation_alloc (atom);
+		int signum;
+		gsl_linalg_LU_decomp (k_inverse, p,&signum);
+		double det = gsl_linalg_LU_det (k_inverse, signum);
+		printf("Det:%.10f\n",det);
+		fprintf(file,"Det:%.10f\n",det);
 		gsl_matrix_free(k_inverse);
 		fclose(file);
 	}
@@ -372,12 +380,12 @@ void add_model(char filename[500],gsl_matrix *m,char matrix_name[500],float init
 	
 	double K_phi1 = 1;				// Facteurs pour angles dièdres
 	double K_phi3 = 0.5;
-	int verbose = 0;
+	int verbose = 1;
 	
 	int all = count_atom(filename);
 	
  	int nconn = count_connect(filename);
- 	//printf("In function:%s\n",filename);
+ 	printf("In function:%s\n",filename);
  	if (verbose == 1) {printf("Connect:%d\n",nconn);}
  	
 	if (verbose == 1) {printf("Assigning Structure\n\tAll Atom\n");}

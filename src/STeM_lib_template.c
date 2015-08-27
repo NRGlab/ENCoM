@@ -278,6 +278,7 @@ void all_interaction(struct pdb_atom *strc,int atom,int res_n, gsl_matrix *ma, i
  		strc[k].type = 0;
  		if (strncmp(strc[k].atom_prot_type," H",2) == 0)	{continue;}
  		if (strncmp(strc[k].atom_prot_type,"H",1) == 0)	    {continue;}
+ 		if (strncmp(strc[k].atom_prot_type," OXT",4) == 0)	{strc[k].type = 2;}
  		if (strc[k].atom_type != 1) {
  			strc[k].type = 6;
  			if (strncmp(strc[k].atom_prot_type," N",2) == 0)	{strc[k].type = 3;}
@@ -449,6 +450,7 @@ void all_interaction(struct pdb_atom *strc,int atom,int res_n, gsl_matrix *ma, i
 			if (strncmp(strc[k].atom_prot_type," CD",3) == 0)	{strc[k].type = 5;}
 			if (strncmp(strc[k].atom_prot_type," CE",3) == 0)	{strc[k].type = 5;}
 			if (strncmp(strc[k].atom_prot_type," CZ",3) == 0)	{strc[k].type = 5;}
+			
 		}
 
 		if (strncmp(strc[k].res_type,"PRO",3) == 0) {
@@ -517,7 +519,7 @@ void all_interaction(struct pdb_atom *strc,int atom,int res_n, gsl_matrix *ma, i
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 	 	}
-	 	//if (strc[k].type == 0) {printf("Res:%s\tAtom Type:-%s-\tType:%d\tK:%d\tAtom:%d\n",strc[k].res_type,strc[k].atom_prot_type,strc[k].type,k,strc[k].atom_number);}
+	 	if (strc[k].type == 0) {printf("Res:%s\tAtom Type:-%s-\tType:%d\tK:%d\tAtom:%d\n",strc[k].res_type,strc[k].atom_prot_type,strc[k].type,k,strc[k].atom_number);}
 	 }
  }
  

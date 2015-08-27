@@ -290,7 +290,7 @@ int count_atom(char filename[100]) {
  }
  int build_cord_CA(struct pdb_atom *all, struct pdb_atom *CA, int atom,int ligand,int **con, int ncon) {
 	int i,j,k,l,n;
-	int lig_flag;
+	int lig_flag = -1;
 	float cord[3];
 	int lig_atom;
 	int lig_tot;
@@ -354,9 +354,10 @@ int count_atom(char filename[100]) {
  		// Si il s'agit d'un atome principal de Node ou bien atom centrale d'un ligand
  		if  (
  				(strncmp(all[i].atom_prot_type," CA ",4) == 0 && (all[i].atom_type == 2 || all[i].atom_type == 1)) || 
- 				(strncmp(all[i].atom_prot_type," O3'",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
- 				(strncmp(all[i].atom_prot_type," C2 ",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
  				(strncmp(all[i].atom_prot_type," P  ",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
+ 				(strncmp(all[i].atom_prot_type," C1'",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
+ 				(strncmp(all[i].atom_prot_type," C2 ",4) == 0 && (all[i].atom_type == 4 || all[i].atom_type == 5)) ||
+
  				lig_flag == 3
  			) {} else {
  			//if (all[i].node < 40) {	printf("I:%d Node:%d	Atom:%d	Type:%s	Res num:%d	Res Type:%s Type:%d Flag:%d\n",i,all[i].node,all[i].atom_number,all[i].atom_prot_type,all[i].res_number,all[i].res_type,all[i].atom_type,lig_flag);}
@@ -365,7 +366,7 @@ int count_atom(char filename[100]) {
  				}
  		if (ligand == 0 && all[i].atom_type == 3) {continue;}
  		if (k > -1) {
- 		if (CA[k].node ==  all[i].node) {continue;}
+ 			if (CA[k].node ==  all[i].node) {continue;}
  		}
  		++k;
  		
@@ -716,10 +717,9 @@ int count_atom(char filename[100]) {
 		
 		if(index > 0) {
 			// Si le numero de residus est différent
-			if (structure[index-1].res_number != structure[index].res_number || strcmp(structure[index-1].res_type,structure[index-1].res_type) != 0) {++n;}
-		}
-		if (index > 0) {
-		    if (structure[index-1].res_number == structure[index].res_number && line[26] != ' ' && line[26] != pline[26])  {++n;}
+			if (structure[index-1].res_number != structure[index].res_number || strcmp(structure[index-1].res_type,structure[index].res_type) != 0 || strcmp(structure[index-1].chain,structure[index].chain) != 0) {++n;}
+		  if (structure[index-1].res_number == structure[index].res_number && line[26] != ' ' && line[26] != pline[26])  {++n;}
+		  
 		}
 		structure[index].node = n;
 		if (structure[index].mass == 0.00) {
