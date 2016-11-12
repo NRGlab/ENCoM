@@ -1,0 +1,13 @@
+Calculate the normal modes, flexibility of residue and vibrationnal entropy of a structure.
+
+For example with the structure 1ey0.pdb
+./ENCoM/bin/build_encom -i 1ey0.pdb -cov 1ey0.cov -o 1ey0.eigen
+
+use the flag -lig to consider HETAM in structure. A mass will be set a the center of mass of each unique residue.
+Please note that this function is experimental and have not been validated
+
+To generate conformations along one mode use the motion binarie file
+
+For example, for motion of mode 10 and maximal distorsion of 2 of RMSD
+./ENCoM/bin/motion -i 1ey0.pdb -m 10 -ieig 1ey0.eigen -p motion10.pdb -md 2.0
+
