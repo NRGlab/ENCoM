@@ -18,7 +18,7 @@ CXXFLAGS = -Wall
 
 INCLUDES = -I/opt/local/include
 
-LIBS = -lgsl -lgslcblas -lm -L/opt/local/lib
+LIBS = -lgsl -lgslcblas -lm -L/opt/local/lib -static
 
 OBJ =   STeM_lib_grid_motion.o                   \
         STeM_lib_hessian.o                 \
