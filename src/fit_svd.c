@@ -11,11 +11,13 @@ int main(int argc, char *argv[]) {
  	char file_name[5000];
  	char check_name[5000];
  	char eigen_name[5000] = "eigen.dat";
+ 	char final_name[5000] = "final.pdb";
  	int verbose = 0;
 	int i;
 	int nbr_mode = 2;
 	int mode = 7;
 	int lig = 0;
+	int output_final = 0;
 	int nconn;
 	int torsion = 0;
 	float ligalign = 0; // Flag/valeur pour aligner seulement les résidus dans un cutoff du ligand, 0, one le fait pas... > 0... le cutoff
@@ -30,11 +32,16 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-m",argv[i]) == 0) {int temp;sscanf(argv[i+1],"%d",&temp);mode = temp;}
  		if (strcmp("-nm",argv[i]) == 0) {int temp;sscanf(argv[i+1],"%d",&temp);nbr_mode = temp;}
  		if (strcmp("-ieig",argv[i]) == 0) {strcpy(eigen_name,argv[i+1]);}
+ 		if (strcmp("-ofinal",argv[i]) == 0) {strcpy(final_name,argv[i+1]);}
  		if (strcmp("-ligc",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);ligalign = temp;}
  		if (strcmp("-angle",argv[i]) == 0) {torsion = 1;}
  		if (strcmp("-iterative",argv[i]) == 0) {iterative_flag = 1;}
  		if (strcmp("-num",argv[i]) == 0) {resnumc_flag = 2;} 
  		
+ 		if (strcmp("-resnumc",argv[i]) == 0) {resnumc_flag = 1;} 
+ 		if (strcmp("-num",argv[i]) == 0) {resnumc_flag = 2;} 
+
+ 		if (strcmp("-final",argv[i]) == 0) {output_final = 1;} 
  	}
  	
  	if (help_flag == 1) {
@@ -125,14 +132,14 @@ int main(int argc, char *argv[]) {
  	if (verbose == 1) {printf("Score: %d/%d\n",score,atom);}
 	//if (atom_t != atom) {printf("Not the same number of Node... Terminating\n");return(0);}
 	
-	if ((float)score/(float)atom < 0.8) {
+	if ((float)score/(float)atom < 0.8 && resnumc_flag == 0) {
  		printf("Low Score... Will try an homemade alignement !!!\n");
  		score = node_align_low(strc_node,atom,strc_node_t,atom_t,align);
  		
  	}
 	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);
 	
-	if (resnumc_flag == 2) {
+ 	if (resnumc_flag == 2) {
  		// Align only based on number (pour GPCR renumber)
  		for(i=0;i<atom;++i) {align[i] = -1;}
  		score = 0;
@@ -149,6 +156,8 @@ int main(int argc, char *argv[]) {
  	}
 	
 	
+ 	
+	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);	
 	if (ligalign > 0) {
 
 		score = node_align_lig(strc_node,atom,strc_node_t,atom_t,align,strc_all,all,strc_all_t,all_t,ligalign);
@@ -188,7 +197,9 @@ int main(int argc, char *argv[]) {
 	}
 	
 	//write_strc("target.pdb",strc_all_t,all);
- 	//write_strc("final.pdb",strc_all,all);
+ 	if (output_final) {
+ 		write_strc(final_name,strc_all,all,1);
+ 	}
 	
     
     free(connect_h);

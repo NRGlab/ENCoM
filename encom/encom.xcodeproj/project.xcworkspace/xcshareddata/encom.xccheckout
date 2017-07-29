@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3688F37A-E6DB-4298-B07B-4032AD19EEC4</string>
+	<key>IDESourceControlProjectName</key>
+	<string>encom</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DB3CF878-75D6-4F9D-ABFD-4A985397D60C</key>
+		<string>https://github.com/vince1589/encom.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>encom/encom.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DB3CF878-75D6-4F9D-ABFD-4A985397D60C</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/vince1589/encom.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DB3CF878-75D6-4F9D-ABFD-4A985397D60C</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DB3CF878-75D6-4F9D-ABFD-4A985397D60C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>encom</string>
+		</dict>
+	</array>
+</dict>
+</plist>

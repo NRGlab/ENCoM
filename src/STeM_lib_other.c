@@ -234,6 +234,8 @@ for(i=0; i < nb_atom_1; ++i) {
 		if (newstrc[k].atom_type == 5) {fprintf(out_file,"HETATM");}
 	 	if (newstrc[k].atom_type == 2) {fprintf(out_file,"HETATM");}
 	 	if (newstrc[k].atom_type == 3) {fprintf(out_file,"HETATM");}
+	 	if (newstrc[k].atom_type == 4) {fprintf(out_file,"ATOM  ");}
+	 	if (newstrc[k].atom_type == 5) {fprintf(out_file,"HETATM");}
 		fprintf(out_file,"%5.d %s%s %s%4d%12.3f%8.3f%8.3f  1.00  %2.2f\n",
 			newstrc[k].atom_number,
  			newstrc[k].atom_prot_type,
@@ -445,7 +447,9 @@ for(i=0; i < nb_atom_1; ++i) {
  	float diff = 0;
  	for (i=0;i<atom;++i) {
  		if (strc[i].atom_type == 3){continue;}
- 		if (strc[i].atom_type == 4 && strncmp(strc[i].atom_prot_type," P  ",4) != 0) {continue;}
+ 		if (strc[i].atom_type == 4 && strncmp(strc[i].atom_prot_type," P  ",4) != 0) {continue;} // added for bfact
+ 		if (strc[i].b_factor < 0.00001) {continue;} 																						 // added for bfact
+
  		++c;
  		moy_x += gsl_matrix_get(m,i,i);
  		moy_y += strc[i].b_factor;
@@ -457,6 +461,8 @@ for(i=0; i < nb_atom_1; ++i) {
  	
  	 for (i=0;i<atom;++i) {
  	 	if (strc[i].atom_type == 3){continue;}
+ 		if (strc[i].atom_type == 4 && strncmp(strc[i].atom_prot_type," P  ",4) != 0) {continue;} // added for bfact
+ 		if (strc[i].b_factor < 0.00001) {continue;} 																						 // added for bfact
  		std_x += (gsl_matrix_get(m,i,i)-moy_x)*(gsl_matrix_get(m,i,i)-moy_x);
  		std_y += (strc[i].b_factor-moy_y)*(strc[i].b_factor-moy_y);
  	}
@@ -466,6 +472,8 @@ for(i=0; i < nb_atom_1; ++i) {
  	
  	 for (i=0;i<atom;++i) {
  	 	if (strc[i].atom_type == 3){continue;}
+ 		if (strc[i].atom_type == 4 && strncmp(strc[i].atom_prot_type," P  ",4) != 0) {continue;} // added for bfact
+ 		if (strc[i].b_factor < 0.00001) {continue;} 																						 // added for bfact
  		prod_tot += (gsl_matrix_get(m,i,i)-moy_x)*(strc[i].b_factor-moy_y);
  	}
  	//printf("Product Tot:%g\n",prod_tot);

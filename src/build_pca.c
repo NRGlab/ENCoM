@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
 	int i,j,k;
 	//int prot = 0;
 	printf("In function\n");
+
 	int nbrAT[5000];
 	
 	int nbrCA[5000];
@@ -81,12 +82,15 @@ int main(int argc, char *argv[]) {
 	for(i=1;i<toread-1;++i) {
 		
 		
-		int score = node_align_low(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
+		int score = node_align(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
 		int align_temp[5000];
 		node_align_low(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
 	  if (noalign == 0) {
  		  printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
  		} 
+		node_align(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
+	
+ 		printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
  	/*	char temp[50];
  		sprintf(temp,"strc_%d.pdb",i);
 		write_strc(temp, allall[i],nbrAT[i],1);
@@ -100,6 +104,7 @@ int main(int argc, char *argv[]) {
 	int master_align[nbrCA[0]];
 	int index = 0;
 	
+
 	float **array=(float **)malloc(5000*sizeof(float *)); 
   for(k=0;k<5000;k++) { array[k]=(float *)malloc(toread*sizeof(float));}
   
