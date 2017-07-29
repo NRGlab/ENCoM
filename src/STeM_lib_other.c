@@ -666,7 +666,7 @@ float calc_energy(int atom,gsl_vector *eval,float t,int m) {
 		float rond = h*v/k;
 		//entro += -R * log(1-power)+(Na*h*v*power)/(t*(1-power));
 		entro += (rond/t)/(pow(e,rond/t)-1)-log(1-pow(e,-rond/t));
-		sum += log(1.0/v);
+		sum += log(v);
 	}
 	
 	//printf("Ental contribution:%f\n",ental/1000);

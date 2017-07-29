@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 	int torsion = 0;
 	float ligalign = 0; // Flag/valeur pour aligner seulement les résidus dans un cutoff du ligand, 0, one le fait pas... > 0... le cutoff
 	int iterative_flag = 0;
+	int resnumc_flag = 0;
  	for (i = 1;i < argc;i++) {
  		if (strcmp("-i",argv[i]) == 0) {strcpy(file_name,argv[i+1]);--help_flag;}
  		if (strcmp("-h",argv[i]) == 0) {help_flag = 1;}
@@ -32,6 +33,8 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-ligc",argv[i]) == 0) {float temp;sscanf(argv[i+1],"%f",&temp);ligalign = temp;}
  		if (strcmp("-angle",argv[i]) == 0) {torsion = 1;}
  		if (strcmp("-iterative",argv[i]) == 0) {iterative_flag = 1;}
+ 		if (strcmp("-num",argv[i]) == 0) {resnumc_flag = 2;} 
+ 		
  	}
  	
  	if (help_flag == 1) {
@@ -127,7 +130,25 @@ int main(int argc, char *argv[]) {
  		score = node_align_low(strc_node,atom,strc_node_t,atom_t,align);
  		
  	}
-	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);	
+	printf("RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);
+	
+	if (resnumc_flag == 2) {
+ 		// Align only based on number (pour GPCR renumber)
+ 		for(i=0;i<atom;++i) {align[i] = -1;}
+ 		score = 0;
+ 		for(i=0;i<atom;++i) {
+ 			if (strc_node[i].atom_type == 3) {continue;}
+ 			int j;
+ 			for(j = 0;j<atom_t;++j) {
+ 				if (strc_node_t[j].atom_type == 3) {continue;}
+ 				if (strc_node[i].res_number == strc_node_t[j].res_number) {align[i] = j;++score;break;}
+ 				
+ 			}
+ 		}
+ 		printf("Only num RMSD:%8.5f Score: %d/%d\n",sqrt(rmsd_no(strc_node,strc_node_t,atom, align)),score,atom);
+ 	}
+	
+	
 	if (ligalign > 0) {
 
 		score = node_align_lig(strc_node,atom,strc_node_t,atom_t,align,strc_all,all,strc_all_t,all_t,ligalign);
@@ -154,8 +175,11 @@ int main(int argc, char *argv[]) {
 	
 	if (torsion == 0) {
 		if (iterative_flag == 1) {
-			fit(strc_node,strc_node_t,atom,all,strc_all,strc_all_t,evec,align,nbr_mode);
+		  //fit_vince(strc_node,struct pdb_atom *targ,int atom,int all,struct pdb_atom *all_init,struct pdb_atom *all_targ,gsl_matrix *evec, int *align, int nb_mode, int mode,gsl_vector *eval)
+		    fit_vince(strc_node,strc_node_t          ,atom    ,all    ,strc_all                 ,strc_all_t               ,evec            ,align      ,nbr_mode    ,mode     ,eval);
+			//fit(strc_node,strc_node_t,atom,all,strc_all,strc_all_t,evec,align,nbr_mode);
 		} else {
+		  
 			fit_svd(strc_node,strc_node_t,atom,all,atom_t,all_t,strc_all,strc_all_t,evec,align,nbr_mode,mode,eval);
 		}
 	} else {

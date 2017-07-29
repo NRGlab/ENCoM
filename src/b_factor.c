@@ -15,7 +15,7 @@ void assign_bfactor(struct pdb_atom *strc, gsl_matrix *m,int atom,int lig) {
 	sum /= count;
 	float ratio = (max-min)/90.0;
 	
-	printf("Average:%.10f Min:%.4f Max:%.4f\n",sum,min,max);
+	printf("Average:%g Min:%g Max:%g\n",sum,min,max);
 	for(i=0;i<atom;++i) {
 		int node = strc[i].node;
 		strc[i].b_factor = (gsl_matrix_get(m,node,node)-min)/ratio+5.0;
@@ -35,9 +35,9 @@ int main(int argc, char *argv[]) {
  	char eigen_name[500] = "eigen.dat";
  	char out_name[500] = "b_factor.pdb";
  	int verbose = 0;
-
+	int mode = 6;
 	int i;
-
+	int toprint = 0;
 	int nconn;
 	int lig = 0;
 
@@ -47,7 +47,9 @@ int main(int argc, char *argv[]) {
  		if (strcmp("-ieig",argv[i]) == 0) {strcpy(eigen_name,argv[i+1]);}
  		if (strcmp("-h",argv[i]) == 0) {help_flag = 1;}
  		if (strcmp("-v",argv[i]) == 0) {verbose = 1;}
- 		if (strcmp("-lig",argv[i]) == 0) {lig= 1;}    
+ 		if (strcmp("-lig",argv[i]) == 0) {lig= 1;}   
+ 		if (strcmp("-print",argv[i]) == 0) {toprint= 1;}   
+ 		if (strcmp("-m",argv[i]) == 0) {int temp;sscanf(argv[i+1],"%d",&temp);mode = temp;} 
  	}
  	
  	if (help_flag == 0) { } else {
@@ -111,7 +113,11 @@ int main(int argc, char *argv[]) {
 	
 	if (verbose == 1) {printf("Inversing Matrix\n");}
 	gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom); /*Déclare et crée une matrice qui va être le pseudo inverse*/
-	k_inverse_matrix_stem(k_inverse,atom,eval,evec,6,atom*3);
+	if (mode < 0) {
+		mode = atom*3+mode;
+	}
+	printf("Mode:%d\n",mode);
+	k_inverse_matrix_stem(k_inverse,atom,eval,evec,mode,atom*3);
 
 	assign_bfactor(strc_all,k_inverse,all,lig);
 	

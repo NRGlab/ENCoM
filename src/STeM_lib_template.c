@@ -519,7 +519,10 @@ void all_interaction(struct pdb_atom *strc,int atom,int res_n, gsl_matrix *ma, i
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 			if (strncmp(strc[k].atom_prot_type," CG",3) == 0)	{strc[k].type = 4;}
 	 	}
-	 	if (strc[k].type == 0) {printf("Res:%s\tAtom Type:-%s-\tType:%d\tK:%d\tAtom:%d\n",strc[k].res_type,strc[k].atom_prot_type,strc[k].type,k,strc[k].atom_number);}
+	 	if (strc[k].type == 0) {
+	 		printf("Res:%s\tAtom Type:-%s-\tType:%d\tK:%d\tAtom:%d\n",strc[k].res_type,strc[k].atom_prot_type,strc[k].type,k,strc[k].atom_number);
+	 		strc[k].type = 6;
+	 	}
 	 }
  }
  

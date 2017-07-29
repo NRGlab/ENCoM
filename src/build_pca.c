@@ -2,13 +2,13 @@
 
 float covar_vince(float *a,float *b,int atom);
 
-double vector_product(float *a,gsl_matrix *evec,int m,int atom) {
+double vector_product(float *a,gsl_matrix *evec,int m,int atom,float *ref) {
 	int i;
 	float sum = 0;
 	for (i = 0;i<atom;++i) {
-//		printf("I:%d -> %f += %f * %f\n",i,sum,a[i],gsl_matrix_get(evec,i,m));
+		//printf("I:%d -> %f += %f * %f\n",i,sum,(a[i]-ref[i]),gsl_matrix_get(evec,i,m));
 	if (a[i] < -9999.0) {continue;}
-		sum += a[i] * gsl_matrix_get(evec,i,m);
+		sum += (a[i]-ref[i]) * gsl_matrix_get(evec,i,m);
 	}
 	return(sum);
 }
@@ -26,8 +26,12 @@ int main(int argc, char *argv[]) {
 	
 	struct pdb_atom* allpdb[5000];
 	struct pdb_atom* allall[5000];
+	int nooutput = 0;
+	int noalign = 0;
 	int toread = 0;
 	for (i = 0;i < argc;i++) {
+	  if (strcmp("-noalign",argv[i]) == 0) {toread = 0;noalign = 1;continue;}
+	  if (strcmp("-no",argv[i]) == 0) {toread = 0;nooutput = 1;continue;}
 		if (strcmp("-il",argv[i]) == 0) {++toread;continue;}
 		if (toread == 0) {continue;}
     printf("I:%d/%d %s\n",i,argc,argv[i]);
@@ -80,8 +84,9 @@ int main(int argc, char *argv[]) {
 		int score = node_align_low(allpdb[0],nbrCA[0],allpdb[i],nbrCA[i],align[i]);
 		int align_temp[5000];
 		node_align_low(allpdb[i],nbrCA[i],allpdb[0],nbrCA[0],align_temp);
-	
- 		printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
+	  if (noalign == 0) {
+ 		  printf("I:%d RMSD:%8.5f Score: %d/%d\n",i,sqrt(rmsd_yes(allpdb[i],allpdb[0],nbrCA[i], align_temp,allall[i],nbrAT[i])),score,nbrCA[0]);
+ 		} 
  	/*	char temp[50];
  		sprintf(temp,"strc_%d.pdb",i);
 		write_strc(temp, allall[i],nbrAT[i],1);
@@ -111,15 +116,7 @@ for(i=0;i<nbrCA[0];++i) {
 			if (align[j][i] == -1) {++k;}
 		}	
 		//printf("K:%d\n",k);
-		// Hard coding the caca pour prendre data IVET
-		/*if ( (allpdb[0][i].res_number > 4    && allpdb[0][i].res_number < 32 ) ||
-		     (allpdb[0][i].res_number  > 35  && allpdb[0][i].res_number < 117) ||
-		     (allpdb[0][i].res_number  > 120 && allpdb[0][i].res_number < 169) ||
-		     (allpdb[0][i].res_number  > 184 && allpdb[0][i].res_number < 353)) {
-		     	k = 0;
-		     } else {
-		     	k = 100;
-		     }*/
+		
 		
 		master_align[i] = k;
 		
@@ -201,23 +198,25 @@ for(i=0;i<nbrCA[0];++i) {
 	printf("Rebuild Eigenvector\n");
 	
 	float tot = 0.0000000000000000;
-	
+	float entrop = 0.00000;
 	for (i=0;i<index;++i) {
 		tot += gsl_vector_get(eval_temp,i);
+		if (gsl_vector_get(eval_temp,i) < 0.001) {continue;}
+		entrop += log(gsl_vector_get(eval_temp,i));
 	
 	}
-	
+	printf("Entrop:%f\n",entrop);
  	FILE *file; /*Pointe le file défini par la fonction*/
  	file = fopen("project.dat","w"); /*Ouvre le fichier*/
 	for (i=0;i<10;++i) {
 		printf("I:%d %5.3f \n",i,gsl_vector_get(eval_temp,i)/tot*100);
 		
 		// Project on eigenvector
-		
-		for (k = 0 ;k<toread-1;++k) {
-			fprintf(file,"	I:%d K:%d %f\n",i,k,vector_product(array_rev[k],evec_temp,i,index));
+		if (nooutput == 0) {
+		  for (k = 0 ;k<toread-1;++k) {
+			  fprintf(file,"	I:%d K:%d %f\n",i,k,vector_product(array_rev[k],evec_temp,i,index,array_rev[0]));
+		  }
 		}
-		
 	
 	}
 	fclose(file);
@@ -235,7 +234,7 @@ for(i=0;i<nbrCA[0];++i) {
 			}
 		}
 	}
-	write_eigen("pca_eigen.dat",evec,eval,3*nbrCA[0]);
+	if (nooutput == 0) {write_eigen("pca_eigen.dat",evec,eval,3*nbrCA[0]);}
 	
 	return(0);
 }

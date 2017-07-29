@@ -288,7 +288,10 @@ int main(int argc, char *argv[]) {
 	}
 	
 	if (no_write == 0) {write_eigen(eigen_name,evec,eval,3*atom);}
-	
+	if (starting_mode < 0) {
+		starting_mode = atom*3+starting_mode;
+		printf("Starting mode:%d\n",starting_mode);
+	}
 	float ener  = 0.0;
 	if (temperature  < 0) {
 		float factor;
@@ -318,6 +321,7 @@ int main(int argc, char *argv[]) {
 	if (covariance_flag > 0) 
 	{
 		gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom);
+		
 		k_inverse_matrix_stem(k_inverse,atom,eval,evec,starting_mode,atom*3-6);
 	//	k_tot_inv_matrix_stem(k_inverse,atom,eval,evec,6,atom);
 		FILE *file;
@@ -348,7 +352,7 @@ int main(int argc, char *argv[]) {
     if (only_bfact == 1) {
     
         gsl_matrix *k_inverse = gsl_matrix_alloc(atom, atom);
-                k_inverse_matrix_stem(k_inverse,atom,eval,evec,6,atom*3-6);
+                k_inverse_matrix_stem(k_inverse,atom,eval,evec,starting_mode,atom*3-6);
                 printf("Correlation:%f\n",correlate(k_inverse,strc_node, atom));
                         gsl_matrix_free(k_inverse);
                         

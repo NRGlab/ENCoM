@@ -139,7 +139,7 @@ int node_align_lig(struct pdb_atom *strc,int atom,struct pdb_atom *strc_t,int at
 	// Fonction qui ne garde que les aa aligne autour du ligand de la TARG
 	int reverse = 0;
 	if (cutoff < 0) {cutoff = -cutoff; reverse = 1;}
-	float coord[200][3]; // Array qui va comprendre les coordone du ligand
+	float coord[10000][3]; // Array qui va comprendre les coordone du ligand
 	
 	// On trouve les ligands et coordone storer dans coord
 	
@@ -591,7 +591,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  	multiplie_matrix(targ_v,3,t_atom,init_v,t_atom,3,corr);
 
  	gsl_linalg_SV_decomp (corr, mat_v,vec_s,vec_w);
- 	printf("DET:%g\n",gsl_matrix_Det3D(corr));
+ 	//printf("DET:%g\n",gsl_matrix_Det3D(corr));
 
 	//gsl_linalg_SV_decomp_jacobi (corr, mat_v, vec_s);
  	
@@ -602,6 +602,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 	multiplie_matrix(mat_v,3,3,corr,3,3,rota);
 
  	rotate_all(rota,t_init,t_atom);
+ 	
  	
  	rmsd = 0;
  	float max_displacement = 0;
@@ -1563,7 +1564,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  	gsl_vector_free(diff);
  }
  
-  void fit_vince(struct pdb_atom *init,struct pdb_atom *targ,int atom,int all,struct pdb_atom *all_init,struct pdb_atom *all_targ,gsl_matrix *evec, int *align, int nb_mode, int mode,gsl_vector *eval) {
+void fit_vince(struct pdb_atom *init,struct pdb_atom *targ,int atom,int all,struct pdb_atom *all_init,struct pdb_atom *all_targ,gsl_matrix *evec, int *align, int nb_mode, int mode,gsl_vector *eval) {
 	int i,j,l,k;
  	float newstrc,old;
 	double amp[nb_mode];
@@ -1633,8 +1634,8 @@ double gsl_matrix_Det3D(gsl_matrix *M){
 			a = quad[0]/2 + quad[2]/2 - quad[1];
 
 			amp[j] = b/(2*a);
-			if (amp[j] > 50) {amp[j] = 0;}
-			if (amp[j] < -50) {amp[j] = 0;}
+			if (amp[j] > 100) {amp[j] = 0;}
+			if (amp[j] < -100) {amp[j] = 0;}
 			if ((2*a) == 0) {amp[j] = 0;}
 			//printf("Amp:%f\t",amp[j]);
 			for(l=0;l<atom;++l) {
@@ -1657,7 +1658,7 @@ double gsl_matrix_Det3D(gsl_matrix *M){
  	old = 0;
  	printf("ASSIGNING MODE\n");
  	float energy = 0;
- 	
+ 	printf("Mode Amplitude Overlap RMSD Energy Eval Improvement\n");
  	for(j=0;j<nb_mode;++j) {
  		old = overlap(atom,mode+j-1,evec,diff,align);	
  		apply_eigen(init,atom,evec,mode+j-1,amp[j]);
@@ -2021,6 +2022,7 @@ float fit_svd(struct pdb_atom *init,struct pdb_atom *targ,int atom,int all,int a
  	float energy = 0;
  	float best_overlap = 0;
  	int best_mode = 0;
+ 	printf("Mode Amplitude Overlap RMSD Energy\n");
  	for(j=0;j<nb_mode;++j) {
  		old = overlap(atom,mode+j-1,evec,diff,align);
  		if (old > best_overlap) {best_overlap = old;best_mode = j + mode;}
